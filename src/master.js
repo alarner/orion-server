@@ -20,7 +20,7 @@ module.exports = function(cluster, config) {
 			var watch = require('watch');
 			
 			watch.watchTree(config.appRoot, function (f, curr, prev) {
-				if (typeof f == "object" && prev === null && curr === null) {
+				if (typeof f == 'object' && prev === null && curr === null) {
 					// Finished walking the tree
 				} else {
 					self.refreshWorkers();
@@ -34,14 +34,16 @@ module.exports = function(cluster, config) {
 			cluster.fork();
 		}
 
+		// Look out for dead workers
 		cluster.on('exit', function(worker, code, signal) {
-			if(!worker.suicide) {
-				winston.warn('worker ' + worker.process.pid + ' died unexpectedly');
-				cluster.fork();
-			}
+			if(worker.suicide) return;
+			winston.warn('worker ' + worker.process.pid + ' died unexpectedly');
+			cluster.fork();
 		});
 	};
 
+	// Kills all of the current workers and forks a new worker for each one killed.
+	// Uses an async queue to ensure that at least one worker is alive at any given time.
 	this.refreshWorkers = function(cb) {
 		var workersToRefresh = _.keys(cluster.workers);
 
