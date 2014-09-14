@@ -1,7 +1,10 @@
 var http = require('http');
-// var router = require('router').Router([options]);
+var Router = require('./router');
 
-module.exports = function(cluster, appRoot) {
+module.exports = function(cluster, config) {
+
+	// Create the router
+	var router = new Router(config);
 
 	// Load all controllers
 
@@ -14,9 +17,7 @@ module.exports = function(cluster, appRoot) {
 
 	this.start = function(cb) {
 		http.createServer(function(req, res) {
-			// console.log(process.pid);
-			// res.writeHead(200);
-			// res.end("hello world\n");
+			router.route(req, res);
 		}).listen(8000);
 		console.log('Started server');
 		cluster.worker.send('orion::ready');
