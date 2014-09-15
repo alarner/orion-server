@@ -1,6 +1,5 @@
 var sinon 	= require('sinon');
 var assert 	= require('chai').assert;
-var path	= require('path');
 var Router 	= require('../src/router');
 
 
@@ -10,20 +9,84 @@ describe('router', function() {
 	var config = {
 		router: {
 			options: {
-				caseSensitive: false,
-				strict: false,
-				mergeParams: false,
 				defaultController: 'IndexController',
 				defaultAction: 'index'
 			},
 			routes: {
-				'get /': 'IndexController.index',
-				'/hello-word': 'HelloController.world'
+				'get /fancy': 'CustomController.fancy',
+				'post /fancy': 'CustomController.postFancy',
+				'put /cstm/:id': 'CustomController.putWithId',
+				'delete /whatwat/:face': 'DeleteController.whatwat',
+				'/hello-world': 'HelloController.world'
 			}
 		}
 	};
 
-	it('test', function() {
-		var router = new Router(config);
+	var router = new Router(config);
+
+	describe('when we call router.route()', function() {
+		describe('with a url that doesn\'t match a custom route', function() {
+			it('should default to the fallback route', function() {
+				var routeInfo = router.route('get', '/mycontroller/myaction');
+				assert.equal(routeInfo.controller, 'mycontroller');
+				assert.equal(routeInfo.action, 'myaction');
+
+				var routeInfo = router.route('post', '/mycontroller/myaction/');
+				assert.equal(routeInfo.controller, 'mycontroller');
+				assert.equal(routeInfo.action, 'myaction');
+
+				var routeInfo = router.route('put', '/mycontroller/');
+				assert.equal(routeInfo.controller, 'mycontroller');
+				assert.equal(routeInfo.action, config.router.options.defaultAction);
+
+				var routeInfo = router.route('delete', '/mycontroller');
+				assert.equal(routeInfo.controller, 'mycontroller');
+				assert.equal(routeInfo.action, config.router.options.defaultAction);
+			});
+		});
+		describe('with a url that matches a custom route', function() {
+			it('should return that custom route', function() {
+				var routeInfo = router.route('get', '/fancy');
+				assert.equal(routeInfo.controller, 'CustomController');
+				assert.equal(routeInfo.action, 'fancy');
+
+				var routeInfo = router.route('post', '/fancy');
+				assert.equal(routeInfo.controller, 'CustomController');
+				assert.equal(routeInfo.action, 'postFancy');
+
+				var routeInfo = router.route('put', '/cstm/7');
+				assert.equal(routeInfo.controller, 'CustomController');
+				assert.equal(routeInfo.action, 'putWithId');
+				assert.equal(routeInfo.params.id, '7');
+
+				var routeInfo = router.route('delete', '/whatwat/askdjhsdf');
+				assert.equal(routeInfo.controller, 'DeleteController');
+				assert.equal(routeInfo.action, 'whatwat');
+				assert.equal(routeInfo.params.face, 'askdjhsdf');
+
+				var routeInfo = router.route('get', '/hello-world');
+				assert.equal(routeInfo.controller, 'HelloController');
+				assert.equal(routeInfo.action, 'world');
+
+				var routeInfo = router.route('post', '/hello-world');
+				assert.equal(routeInfo.controller, 'HelloController');
+				assert.equal(routeInfo.action, 'world');
+
+				var routeInfo = router.route('put', '/hello-world');
+				assert.equal(routeInfo.controller, 'HelloController');
+				assert.equal(routeInfo.action, 'world');
+
+				var routeInfo = router.route('delete', '/hello-world');
+				assert.equal(routeInfo.controller, 'HelloController');
+				assert.equal(routeInfo.action, 'world');
+			});
+		});
+		describe('with the root url (/)', function() {
+			it('should use the defaults specified in the config', function() {
+				var routeInfo = router.route('get', '/');
+				assert.equal(routeInfo.controller, config.router.options.defaultController);
+				assert.equal(routeInfo.action, config.router.options.defaultAction);
+			});
+		});
 	});
 });
