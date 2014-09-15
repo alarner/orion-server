@@ -27,21 +27,33 @@ describe('router', function() {
 	describe('when we call router.route()', function() {
 		describe('with a url that doesn\'t match a custom route', function() {
 			it('should default to the fallback route', function() {
-				var routeInfo = router.route('get', '/mycontroller/myaction');
-				assert.equal(routeInfo.controller, 'mycontroller');
+				var routeInfo = router.route('get', '/what/myaction');
+				assert.equal(routeInfo.controller, 'WhatController');
 				assert.equal(routeInfo.action, 'myaction');
 
-				var routeInfo = router.route('post', '/mycontroller/myaction/');
-				assert.equal(routeInfo.controller, 'mycontroller');
+				var routeInfo = router.route('post', '/what/myaction/');
+				assert.equal(routeInfo.controller, 'WhatController');
 				assert.equal(routeInfo.action, 'myaction');
 
-				var routeInfo = router.route('put', '/mycontroller/');
-				assert.equal(routeInfo.controller, 'mycontroller');
+				var routeInfo = router.route('put', '/what/');
+				assert.equal(routeInfo.controller, 'WhatController');
 				assert.equal(routeInfo.action, config.router.options.defaultAction);
 
-				var routeInfo = router.route('delete', '/mycontroller');
-				assert.equal(routeInfo.controller, 'mycontroller');
+				var routeInfo = router.route('delete', '/what');
+				assert.equal(routeInfo.controller, 'WhatController');
 				assert.equal(routeInfo.action, config.router.options.defaultAction);
+			});
+
+			describe('with dashes in it', function() {
+				it('should default to the fallback route and convert the dashes', function() {
+					var routeInfo = router.route('get', '/hello-earth');
+					assert.equal(routeInfo.controller, 'HelloEarthController');
+					assert.equal(routeInfo.action, config.router.options.defaultAction);
+
+					var routeInfo = router.route('get', '/hello-earth/speak-now');
+					assert.equal(routeInfo.controller, 'HelloEarthController');
+					assert.equal(routeInfo.action, 'speakNow');
+				});
 			});
 		});
 		describe('with a url that matches a custom route', function() {

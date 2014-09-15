@@ -27,12 +27,28 @@ module.exports = function(config) {
 			var info = _.extend({}, route.info);
 
 			if(info.controller == null) {
-				info.controller = match.controller || config.router.options.defaultController;
+				info.controller = 
+					match.controller ?
+						_.map(
+							match.controller.split('-'),
+							_s.capitalize
+						)
+						.join('')+'Controller'
+					: config.router.options.defaultController;
 				delete match.controller;
 			}
 
 			if(info.action == null) {
-				info.action = match.action || config.router.options.defaultAction;
+				info.action = 
+					match.action ?
+						_.map(
+							match.action.split('-'),
+							_s.capitalize
+						)
+						.join('')
+					: config.router.options.defaultAction;
+				info.action = info.action.charAt(0).toLowerCase() + info.action.slice(1);
+				// info.action = match.action || config.router.options.defaultAction;
 				delete match.action;
 			}
 
