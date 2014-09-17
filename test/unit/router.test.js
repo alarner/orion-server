@@ -1,32 +1,17 @@
 var sinon 	= require('sinon');
 var assert 	= require('chai').assert;
-var Router 	= require('../src/router');
+var Router 	= require('../../src/router');
 
 
 describe('router', function() {
-	before(require('./before'));
-
-	var config = {
-		router: {
-			options: {
-				defaultController: 'IndexController',
-				defaultAction: 'index'
-			},
-			routes: {
-				'get /fancy': 'CustomController.fancy',
-				'post /fancy': 'CustomController.postFancy',
-				'put /cstm/:id': 'CustomController.putWithId',
-				'delete /whatwat/:face': 'DeleteController.whatwat',
-				'/hello-world': 'HelloController.world'
-			}
-		}
-	};
-
-	var router = new Router(config);
+	before(require('../before'));
+	beforeEach(require('../beforeEach'));
 
 	describe('when we call router.route()', function() {
 		describe('with a url that doesn\'t match a custom route', function() {
 			it('should default to the fallback route', function() {
+				var router = new Router(this.config);
+
 				var routeInfo = router.route('get', '/what/myaction');
 				assert.equal(routeInfo.controller, 'WhatController');
 				assert.equal(routeInfo.action, 'myaction');
@@ -37,18 +22,20 @@ describe('router', function() {
 
 				var routeInfo = router.route('put', '/what/');
 				assert.equal(routeInfo.controller, 'WhatController');
-				assert.equal(routeInfo.action, config.router.options.defaultAction);
+				assert.equal(routeInfo.action, this.config.router.options.defaultAction);
 
 				var routeInfo = router.route('delete', '/what');
 				assert.equal(routeInfo.controller, 'WhatController');
-				assert.equal(routeInfo.action, config.router.options.defaultAction);
+				assert.equal(routeInfo.action, this.config.router.options.defaultAction);
 			});
 
 			describe('with dashes in it', function() {
 				it('should default to the fallback route and convert the dashes', function() {
+					var router = new Router(this.config);
+
 					var routeInfo = router.route('get', '/hello-earth');
 					assert.equal(routeInfo.controller, 'HelloEarthController');
-					assert.equal(routeInfo.action, config.router.options.defaultAction);
+					assert.equal(routeInfo.action, this.config.router.options.defaultAction);
 
 					var routeInfo = router.route('get', '/hello-earth/speak-now');
 					assert.equal(routeInfo.controller, 'HelloEarthController');
@@ -58,6 +45,8 @@ describe('router', function() {
 		});
 		describe('with a url that matches a custom route', function() {
 			it('should return that custom route', function() {
+				var router = new Router(this.config);
+
 				var routeInfo = router.route('get', '/fancy');
 				assert.equal(routeInfo.controller, 'CustomController');
 				assert.equal(routeInfo.action, 'fancy');
@@ -95,9 +84,11 @@ describe('router', function() {
 		});
 		describe('with the root url (/)', function() {
 			it('should use the defaults specified in the config', function() {
+				var router = new Router(this.config);
+				
 				var routeInfo = router.route('get', '/');
-				assert.equal(routeInfo.controller, config.router.options.defaultController);
-				assert.equal(routeInfo.action, config.router.options.defaultAction);
+				assert.equal(routeInfo.controller, this.config.router.options.defaultController);
+				assert.equal(routeInfo.action, this.config.router.options.defaultAction);
 			});
 		});
 	});

@@ -1,17 +1,12 @@
 var sinon 	= require('sinon');
 var assert 	= require('chai').assert;
 var path	= require('path');
-var Master 	= require('../src/master');
+var Master 	= require('../../src/master');
 
 
 describe('master', function() {
-	before(require('./before'));
-
-	var config = {
-		webserver: {
-			workerCount: 2
-		}
-	};
+	before(require('../before'));
+	beforeEach(require('../beforeEach'));
 
 	describe('when we call master.start()', function() {
 		it('should fork some worker processes', function() {
@@ -19,9 +14,9 @@ describe('master', function() {
 				on: sinon.spy(),
 				fork: sinon.spy()
 			};
-			var s1 = new Master(cluster, config);
+			var s1 = new Master(cluster, this.config);
 			s1.start();
-			assert.equal(cluster.fork.callCount, config.webserver.workerCount, 'master reads workerCount from config');
+			assert.equal(cluster.fork.callCount, this.config.webserver.workerCount, 'master reads workerCount from config');
 
 			cluster.on.reset();
 			cluster.fork.reset();
@@ -51,7 +46,7 @@ describe('master', function() {
 					}
 				}
 			};
-			var s = new Master(cluster, config);
+			var s = new Master(cluster, this.config);
 			s.refreshWorkers(function() {
 				assert.equal(cluster.workers['1'].kill.callCount, 1, 'first worker killed once');
 				assert.equal(cluster.workers['2'].kill.callCount, 1, 'second worker killed once');

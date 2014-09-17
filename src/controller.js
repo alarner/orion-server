@@ -109,6 +109,5 @@ module.exports = function(config) {
 			dirname     :  dirname,
 			filter      :  /^([^\.].*)\.js$/
 		});
-		self.cachedPolicies['orion::core'] = require('./core');
 	};
 };
