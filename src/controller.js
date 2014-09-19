@@ -23,6 +23,7 @@ module.exports = function(config) {
 	};
 	
 	this.run = function(req, res, info) {
+		req.info = info;
 		self.prepare(req, res, function(err) {
 			if(!self.cachedControllers.hasOwnProperty(info.controller))
 				return res.notFound();
