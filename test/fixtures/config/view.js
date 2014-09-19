@@ -14,5 +14,7 @@ module.exports = {
 	// Open tag, defaulting to "<%"
 	open: '<%',
 	// Closing tag, defaulting to "%>"
-	close: '%>'
+	close: '%>',
+	// Specifies the path to the error view. Defaults to the orion error view.
+	error: null
 };

@@ -1,7 +1,8 @@
 var sinon 	= require('sinon');
 var assert 	= require('chai').assert;
-var path	= require('path');
 var Response = require('../../src/response');
+var reqGen = require('../fixtures/requests/req1');
+var resGen = require('../fixtures/responses/res1');
 
 describe('response', function() {
 	before(require('../before'));
@@ -10,8 +11,8 @@ describe('response', function() {
 	describe('when we run our response through Response', function() {
 		it('should add the request to the response', function() {
 
-			var req = require('../fixtures/requests/req1');
-			var res = require('../fixtures/responses/res1');
+			var req = reqGen();
+			var res = resGen();
 			Response(req, res, this.config);
 			
 			assert.isDefined(res.req);
@@ -19,8 +20,8 @@ describe('response', function() {
 
 		it('should add the express app to the response', function() {
 
-			var req = require('../fixtures/requests/req1');
-			var res = require('../fixtures/responses/res1');
+			var req = reqGen();
+			var res = resGen();
 			Response(req, res, this.config);
 			
 			assert.isDefined(res.app);
@@ -28,8 +29,8 @@ describe('response', function() {
 
 		it('should extend the express response', function() {
 
-			var req = require('../fixtures/requests/req1');
-			var res = require('../fixtures/responses/res1');
+			var req = reqGen();
+			var res = resGen();
 			Response(req, res, this.config);
 			
 			assert.isDefined(res.send);
@@ -37,11 +38,20 @@ describe('response', function() {
 
 		it('add the view method to the response', function() {
 
-			var req = require('../fixtures/requests/req1');
-			var res = require('../fixtures/responses/res1');
+			var req = reqGen();
+			var res = resGen();
 			Response(req, res, this.config);
 			
 			assert.isDefined(res.view);
+		});
+
+		it('add the error method to the response', function() {
+
+			var req = reqGen();
+			var res = resGen();
+			Response(req, res, this.config);
+			
+			assert.isDefined(res.error);
 		});
 	});
 });

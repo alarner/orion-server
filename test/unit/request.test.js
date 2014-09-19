@@ -1,7 +1,8 @@
 var sinon 	= require('sinon');
 var assert 	= require('chai').assert;
-var path	= require('path');
 var Request = require('../../src/request');
+var reqGen = require('../fixtures/requests/req1');
+var resGen = require('../fixtures/responses/res1');
 
 describe('request', function() {
 	before(require('../before'));
@@ -10,8 +11,8 @@ describe('request', function() {
 	describe('when we run our request through Request', function() {
 		it('should add the response to the request', function() {
 
-			var req = require('../fixtures/requests/req1');
-			var res = require('../fixtures/responses/res1');
+			var req = reqGen();
+			var res = resGen();
 			Request(req, res, this.config);
 			
 			assert.isDefined(req.res);
@@ -19,8 +20,8 @@ describe('request', function() {
 
 		it('should add the express app to the request', function() {
 
-			var req = require('../fixtures/requests/req1');
-			var res = require('../fixtures/responses/res1');
+			var req = reqGen();
+			var res = resGen();
 			Request(req, res, this.config);
 			
 			assert.isDefined(req.app);
@@ -28,8 +29,8 @@ describe('request', function() {
 
 		it('should extend the express request', function() {
 
-			var req = require('../fixtures/requests/req1');
-			var res = require('../fixtures/responses/res1');
+			var req = reqGen();
+			var res = resGen();
 			Request(req, res, this.config);
 			
 			assert.isDefined(req.header);

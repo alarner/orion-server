@@ -4,20 +4,19 @@ var path = require('path');
 var fs = require('fs');
 var async = require('async');
 
-var ViewException = function(message) {
-	this.type = 'ViewException';
-	this.message = message;
-};
-
 var View = {
 	cache: {},
-	render: function(req, res, config, viewPath, params) {
+	render: function(req, res, config, viewPath, params, cb) {
 		var params = params || {};
 
 		// No path is specified, try to create a default
 		if(!viewPath || _.isObject(viewPath)) {
 			params = viewPath || {};
-			if(!req.info) throw new ViewException('Missing request info.');
+			if(!req.info) {
+				var err = 'Missing request info.';
+				res.error(err);
+				return cb ? cb(err) : false;
+			}
 
 			var controllerName = 
 				req.info.controller
@@ -31,8 +30,9 @@ var View = {
 				req.info.action.toLowerCase()+'.ejs'
 			);
 		}
-		// Use the path that was passed in
-		else {
+		// Use the path that was passed in. Make it relative to appRoot/views 
+		// unless it's an absolute path.
+		else if(viewPath.charAt(0) != '/') {
 			viewPath = path.join(config.appRoot, 'views', viewPath);
 		}
 
@@ -43,7 +43,6 @@ var View = {
 
 				fs.readFile(viewPath, function(err, viewData) {
 					if(err) return cb(err);
-						console.log(err);
 					
 					var compiled = ejs.compile(viewData.toString(), config.view);
 					if(!compiled) return cb('Unable to compile view.');
@@ -52,9 +51,17 @@ var View = {
 				});
 			}
 		}, function(err, result) {
-			// @todo make this message configurable or give the ability to turn it off
-			if(err) return res.status(500).send(err);
-			res.send(result.compiled(params))
+			if(err) {
+				if(err.code && err.code == 'ENOENT') {
+					res.error('Could not find view: '+err.path, 404);
+				}
+				else {
+					res.error(err);
+				}
+				return cb ? cb(err) : false;
+			}
+			res.send(result.compiled(params));
+			if(cb) cb();
 		});
 	}
 };

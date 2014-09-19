@@ -1,6 +1,8 @@
-module.exports = {
-	info: {
-		controller: 'IndexController',
-		action: 'index'
-	}
+module.exports = function() {
+	return {
+		info: {
+			controller: 'IndexController',
+			action: 'index'
+		}
+	};
 };
