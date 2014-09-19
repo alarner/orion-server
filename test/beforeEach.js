@@ -1,5 +1,7 @@
 var path = require('path');
 var includeAll = require('include-all');
+var express = require('express');
+
 module.exports = function() {
 	var appRoot = path.join(__dirname, 'fixtures');
 
@@ -9,4 +11,5 @@ module.exports = function() {
 		filter      :  /^([^\.].*)\.js$/
 	});
 	this.config.appRoot = appRoot;
+	this.config.express = {app: express()};
 };

@@ -14,5 +14,5 @@ module.exports = {
 	// Open tag, defaulting to "<%"
 	open: '<%',
 	// Closing tag, defaulting to "%>"
-	close '%>'
+	close: '%>'
 };
