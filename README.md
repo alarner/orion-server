@@ -1,4 +1,4 @@
 orion-server
 ============
 
-PLaying around with node clustering
+Playing around with node clustering

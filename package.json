@@ -13,9 +13,11 @@
     "lodash": "^2.4.1",
     "mime": "^1.2.11",
     "optimist": "^0.6.1",
+    "sails-disk": "^0.10.3",
     "underscore.string": "^2.3.3",
     "url-pattern": "^0.6.0",
     "watch": "^0.11.0",
+    "waterline": "^0.10.9",
     "winston": "^0.7.3"
   },
   "devDependencies": {
