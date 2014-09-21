@@ -22,7 +22,7 @@ module.exports = function(config) {
 		cb();
 	};
 	
-	this.run = function(req, res, info) {
+	this.run = function(req, res, info, models) {
 		req.info = info;
 		self.prepare(req, res, function(err) {
 			if(!self.cachedControllers.hasOwnProperty(info.controller))
@@ -36,7 +36,7 @@ module.exports = function(config) {
 					return self.cachedPolicies[policyName](req, res, cb);
 				},
 				function(err) {
-					self.cachedControllers[info.controller][info.action](req, res);
+					self.cachedControllers[info.controller][info.action](req, res, models);
 				}
 			);
 		});
