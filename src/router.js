@@ -1,6 +1,8 @@
 var _ = require('lodash');
+var async = require('async');
 var urlPattern = require('url-pattern');
 var _s = require('underscore.string');
+var path = require('path');
 var Controller = require('./controller');
 
 var RouterException = function(message) {
@@ -62,49 +64,36 @@ module.exports = function(config) {
 		return false;
 	};
 
-	this.loadRoutes = function(routeObject) {
+	this.loadRoutes = function() {
 		self.routes = [];
 
-		self.addRoutes(routeObject, self.routes);
+		// Add application routes
+		self.addRoutes(config.router.routes, self.routes, null, null, false);
 
-		// // Parse the app routes list
-		// _.forOwn(routeObject, function(val, key) {
-		// 	var pieces = val.split('.');
-		// 	if(pieces.length != 2)
-		// 		throw new RouterException('Invalid route target: "'+val+'". It must be in the format [Controller].[action]');
+		// Add plugin routes
+		_.forOwn(config.plugins, function(info, name) {
+			self.addRoutes(info.config.router.routes, self.routes, name, info.prefix, true);
+		});
 
-		// 	key = key.trim();
-		// 	var parsed = {
-		// 		method: '*',
-		// 		route: key,
-		// 		controller: pieces[0],
-		// 		action: pieces[1]
-		// 	};
-		// 	var matched = key.match(/^(get|put|post|delete)\s+(.+)$/);
-		// 	if(matched) {
-		// 		parsed.method = matched[1].toLowerCase();
-		// 		parsed.route = matched[2].trim();
-		// 	}
-
-		// 	self.routes.push({
-		// 		pattern: urlPattern.newPattern(parsed.route),
-		// 		info: parsed
-		// 	});
-		// });
-
-		// self.routes.push({
-		// 	pattern: urlPattern.newPattern('/(:controller)(/:action)(/:id)'),
-		// 	info: {
-		// 		method: '*',
-		// 		route: '/(:controller)(/:action)(/:id)',
-		// 		controller: null,
-		// 		action: null
-		// 	}
-		// });
+		// Add application catchall route
+		var route = '/(:controller)(/:action)(/:id)';
+		self.routes.push({
+			pattern: urlPattern.newPattern(route),
+			info: {
+				method: '*',
+				route: route,
+				controller: null,
+				action: null,
+				prefix: false,
+				plugin: false
+			}
+		});
 	};
 
-	this.addRoutes = function(routeObject, routes, plugin, prefix) {
+	this.addRoutes = function(routeObject, routes, plugin, prefix, catchall) {
+		if(catchall === undefined) catchall = true;
 		if(!prefix || !prefix.length) prefix = false;
+		if(!plugin || !plugin.length) plugin = false;
 
 		// Normalize the prefix to start with a forward slash and *not* end with a forward slash.
 		if(prefix)
@@ -142,20 +131,22 @@ module.exports = function(config) {
 			});
 		});
 
-		var route = '/(:controller)(/:action)(/:id)';
-		if(prefix)
-			route = prefix+route;
+		if(catchall) {
+			var route = '(/:controller)(/:action)(/:id)';
+			if(prefix)
+				route = prefix+route;
 
-		self.routes.push({
-			pattern: urlPattern.newPattern('/(:controller)(/:action)(/:id)'),
-			info: {
-				method: '*',
-				route: route,
-				controller: null,
-				action: null,
-				prefix: prefix,
-				plugin: plugin
-			}
-		});
+			self.routes.push({
+				pattern: urlPattern.newPattern(route),
+				info: {
+					method: '*',
+					route: route,
+					controller: null,
+					action: null,
+					prefix: prefix,
+					plugin: plugin
+				}
+			});
+		}
 	};
 };

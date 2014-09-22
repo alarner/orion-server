@@ -8,6 +8,7 @@ module.exports = {
 		'post /fancy': 'CustomController.postFancy',
 		'put /cstm/:id': 'CustomController.putWithId',
 		'delete /whatwat/:face': 'DeleteController.whatwat',
-		'/hello-world': 'HelloController.world'
+		'/hello-world': 'HelloController.world',
+		'/test/override': 'CustomController.override'
 	}
 };

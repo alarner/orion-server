@@ -16,8 +16,17 @@ module.exports = function(appRoot) {
 
 	// Load configuration files
 	var config = includeAll({
-		dirname     :  appRoot + '/config',
+		dirname     :  path.join(appRoot, 'config'),
 		filter      :  /^([^\.].*)\.js$/
+	});
+	_.forOwn(config.plugins, function(pluginInfo, pluginName) {
+		if(!pluginInfo.hasOwnProperty('prefix'))
+			pluginInfo.prefix = '/'+pluginName;
+
+		config.plugins[pluginName].config = includeAll({
+			dirname     :  path.join(appRoot, 'node_modules', pluginName, 'config'),
+			filter      :  /^([^\.].*)\.js$/
+		});
 	});
 	config.appRoot = appRoot;
 
