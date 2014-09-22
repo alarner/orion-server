@@ -10,6 +10,7 @@ var RouterException = function(message) {
 
 module.exports = function(config) {
 	var self = this;
+	this.routes = [];
 
 	this.route = function(method, url) {	
 		for(var i in self.routes) {
@@ -64,23 +65,75 @@ module.exports = function(config) {
 	this.loadRoutes = function(routeObject) {
 		self.routes = [];
 
-		// Parse the routes list
+		self.addRoutes(routeObject, self.routes);
+
+		// // Parse the app routes list
+		// _.forOwn(routeObject, function(val, key) {
+		// 	var pieces = val.split('.');
+		// 	if(pieces.length != 2)
+		// 		throw new RouterException('Invalid route target: "'+val+'". It must be in the format [Controller].[action]');
+
+		// 	key = key.trim();
+		// 	var parsed = {
+		// 		method: '*',
+		// 		route: key,
+		// 		controller: pieces[0],
+		// 		action: pieces[1]
+		// 	};
+		// 	var matched = key.match(/^(get|put|post|delete)\s+(.+)$/);
+		// 	if(matched) {
+		// 		parsed.method = matched[1].toLowerCase();
+		// 		parsed.route = matched[2].trim();
+		// 	}
+
+		// 	self.routes.push({
+		// 		pattern: urlPattern.newPattern(parsed.route),
+		// 		info: parsed
+		// 	});
+		// });
+
+		// self.routes.push({
+		// 	pattern: urlPattern.newPattern('/(:controller)(/:action)(/:id)'),
+		// 	info: {
+		// 		method: '*',
+		// 		route: '/(:controller)(/:action)(/:id)',
+		// 		controller: null,
+		// 		action: null
+		// 	}
+		// });
+	};
+
+	this.addRoutes = function(routeObject, routes, plugin, prefix) {
+		if(!prefix || !prefix.length) prefix = false;
+
+		// Normalize the prefix to start with a forward slash and *not* end with a forward slash.
+		if(prefix)
+			prefix = path.join('/', prefix);
+		if(prefix && prefix.charAt(prefix.length-1) == '/')
+			prefix.substring(0, prefix.length-1);
+		
+		// Parse the app routes list
 		_.forOwn(routeObject, function(val, key) {
 			var pieces = val.split('.');
 			if(pieces.length != 2)
 				throw new RouterException('Invalid route target: "'+val+'". It must be in the format [Controller].[action]');
 
 			key = key.trim();
+			if(prefix) key = path.join(prefix, key);
 			var parsed = {
 				method: '*',
 				route: key,
 				controller: pieces[0],
-				action: pieces[1]
+				action: pieces[1],
+				prefix: prefix,
+				plugin: plugin
 			};
 			var matched = key.match(/^(get|put|post|delete)\s+(.+)$/);
 			if(matched) {
+				var route = matched[2].trim();
+				if(prefix) route = path.join(prefix, route);
 				parsed.method = matched[1].toLowerCase();
-				parsed.route = matched[2].trim();
+				parsed.route = route;
 			}
 
 			self.routes.push({
@@ -89,19 +142,20 @@ module.exports = function(config) {
 			});
 		});
 
+		var route = '/(:controller)(/:action)(/:id)';
+		if(prefix)
+			route = prefix+route;
+
 		self.routes.push({
 			pattern: urlPattern.newPattern('/(:controller)(/:action)(/:id)'),
 			info: {
 				method: '*',
-				route: '/(:controller)(/:action)(/:id)',
+				route: route,
 				controller: null,
-				action: null
+				action: null,
+				prefix: prefix,
+				plugin: plugin
 			}
 		});
 	};
-
-	this.controller = new Controller();
-	this.routes = [];
-
-	this.loadRoutes(config.router.routes);
 };

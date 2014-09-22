@@ -10,6 +10,7 @@ module.exports = function(cluster, config) {
 
 	// Create the router
 	var router = new Router(config);
+	router.loadRoutes(config.router.routes);
 	config.express = {app: express()};
 
 	this.start = function(cb) {

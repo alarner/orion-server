@@ -11,6 +11,7 @@ describe('router', function() {
 		describe('with a url that doesn\'t match a custom route', function() {
 			it('should default to the fallback route', function() {
 				var router = new Router(this.config);
+				router.loadRoutes(this.config.router.routes);
 
 				var routeInfo = router.route('get', '/what/myaction');
 				assert.equal(routeInfo.controller, 'WhatController');
@@ -32,6 +33,7 @@ describe('router', function() {
 			describe('with dashes in it', function() {
 				it('should default to the fallback route and convert the dashes', function() {
 					var router = new Router(this.config);
+					router.loadRoutes(this.config.router.routes);
 
 					var routeInfo = router.route('get', '/hello-earth');
 					assert.equal(routeInfo.controller, 'HelloEarthController');
@@ -46,6 +48,7 @@ describe('router', function() {
 		describe('with a url that matches a custom route', function() {
 			it('should return that custom route', function() {
 				var router = new Router(this.config);
+				router.loadRoutes(this.config.router.routes);
 
 				var routeInfo = router.route('get', '/fancy');
 				assert.equal(routeInfo.controller, 'CustomController');
@@ -85,6 +88,7 @@ describe('router', function() {
 		describe('with the root url (/)', function() {
 			it('should use the defaults specified in the config', function() {
 				var router = new Router(this.config);
+				router.loadRoutes(this.config.router.routes);
 				
 				var routeInfo = router.route('get', '/');
 				assert.equal(routeInfo.controller, this.config.router.options.defaultController);
