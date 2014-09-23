@@ -11,10 +11,11 @@ describe('controller', function() {
 	describe('when we call controller.loadPolicies', function() {
 		it('should load all of the policies', function() {
 			var controller = new Controller(this.config);
-			controller.loadPolicies(path.join(this.config.appRoot, 'app', 'policies'));
+			controller.loadPolicies();
 
 			assert.isDefined(controller.cachedPolicies.greeting);
 			assert.isDefined(controller.cachedPolicies.auth);
+			assert.isDefined(controller.cachedPolicies['orion-test-plugin::auth']);
 			assert.isUndefined(controller.cachedPolicies.test);
 		});
 	});

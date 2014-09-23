@@ -2,6 +2,7 @@ var includeAll = require('include-all');
 var async = require('async');
 var _ = require('lodash');
 var winston = require('winston');
+var path = require('path');
 
 module.exports = function(config) {
 	var self = this;
@@ -33,10 +34,10 @@ module.exports = function(config) {
 			async.eachSeries(
 				self.policySettings[info.controller][info.action],
 				function(policyName, cb) {
-					return self.cachedPolicies[policyName](req, res, cb);
+					return self.cachedPolicies[policyName](req, res, models, config, cb);
 				},
 				function(err) {
-					self.cachedControllers[info.controller][info.action](req, res, models);
+					self.cachedControllers[info.controller][info.action](req, res, models, config);
 				}
 			);
 		});
@@ -105,10 +106,28 @@ module.exports = function(config) {
 		});
 	};
 
-	this.loadPolicies = function(dirname) {
+	this.loadPolicies = function() {
+		// Load app policies
 		self.cachedPolicies = includeAll({
-			dirname     :  dirname,
+			dirname     :  path.join(config.appRoot, 'app', 'policies'),
 			filter      :  /^([^\.].*)\.js$/
+		});
+
+		// Load plugin policies
+		_.forOwn(config.plugins, function(pluginInfo, pluginName) {
+			var policies = null;
+			try {
+				policies = includeAll({
+					dirname     :  path.join(config.appRoot, 'node_modules', pluginName, 'app', 'policies'),
+					filter      :  /^([^\.].*)\.js$/
+				});
+			}
+			catch(e) {
+				policies = {};
+			}
+			_.forOwn(policies, function(policy, policyName) {
+				self.cachedPolicies[pluginName+'::'+policyName] = policy;
+			});
 		});
 	};
 };
