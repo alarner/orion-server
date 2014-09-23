@@ -2,6 +2,7 @@ var includeAll = require('include-all');
 var path = require('path');
 var _ = require('lodash');
 var Waterline = require('waterline');
+var changeCase = require('change-case');
 var underscoreDeepExtend = require('underscore-deep-extend');
 _.mixin({deepExtend: underscoreDeepExtend(_)});
 
@@ -35,7 +36,7 @@ module.exports = function(config) {
 			filter      :  /^([^\.].*)\.js$/
 		});
 		_.forOwn(models, function(model, modelName) {
-			model.identity = model.identity || modelName.toLowerCase(); // @todo convert multi word tables to underscores
+			model.identity = model.identity || changeCase.snakeCase(modelName); // @todo convert multi word tables to underscores
 			model.connection = model.connection || defaultConnection;
 			var extendedModel = Waterline.Collection.extend(model);
 			self.waterline.loadCollection(extendedModel);
@@ -60,7 +61,7 @@ module.exports = function(config) {
 					model.identity = pluginInfo.prefix.model+model.identity;
 				}
 				else {
-					model.identity = pluginInfo.prefix.model+modelName.toLowerCase();
+					model.identity = pluginInfo.prefix.model+changeCase.snakeCase(modelName);
 				}
 				model.connection = model.connection || defaultConnection;
 

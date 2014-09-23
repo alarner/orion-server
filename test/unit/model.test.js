@@ -40,6 +40,18 @@ describe('model', function() {
 			});
 		});
 
+		it('should convert model identities to snake_case', function(done) {
+			var self = this;
+			this.model.loadDatabase(function(err, models) {
+				assert.isNull(err);
+				assert.isDefined(self.model.waterline);
+				assert.isDefined(models.user_auth_option);
+				assert.isDefined(models.user_auth_type);
+				assert.isDefined(models.test_test_test);
+				done();
+			});
+		});
+
 		it('should apply model overrides to plugin models', function(done) {
 			var self = this;
 			this.model.loadDatabase(function(err, models) {
