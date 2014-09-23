@@ -1,6 +1,9 @@
 module.exports = {
 	'orion-test-plugin': {
-		prefix: '/test'
+		prefix: {
+			route: '/test',
+			model: 'test_'
+		}
 	},
 	'no-config-plugin': {
 		

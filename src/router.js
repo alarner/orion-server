@@ -74,11 +74,12 @@ module.exports = function(config) {
 		_.forOwn(config.plugins, function(info, name) {
 			if(!info.config.router) info.config.router = {};
 			if(!info.config.router.routes) info.config.router.routes = {};
+
 			self.addRoutes(
 				info.config.router.routes,
 				self.routes,
 				name,
-				info.prefix,
+				info.prefix.route,
 				true
 			);
 		});

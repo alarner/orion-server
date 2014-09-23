@@ -29,5 +29,15 @@ describe('model', function() {
 				done();
 			});
 		});
+
+		it('should load the plugin models', function(done) {
+			var self = this;
+			this.model.loadDatabase(function(err, models) {
+				assert.isNull(err);
+				assert.isDefined(self.model.waterline);
+				assert.isDefined(models.test_test);
+				done();
+			});
+		});
 	});
 });

@@ -27,7 +27,7 @@ module.exports = function(config) {
 		if(!defaultConnection)
 			return cb('You must specify at least one connection in config/database.js');
 
-		// Fill in data on our models
+		// Fill in attributes on app models
 		var models = includeAll({
 			dirname     :  path.join(config.appRoot, 'app', 'models'),
 			filter      :  /^([^\.].*)\.js$/
@@ -37,6 +37,33 @@ module.exports = function(config) {
 			model.connection = model.connection || defaultConnection;
 			var extendedModel = Waterline.Collection.extend(model);
 			self.waterline.loadCollection(extendedModel);
+		});
+
+		// Fill in attributes on plugin models
+		_.forOwn(config.plugins, function(pluginInfo, pluginName) {
+			var models = null;
+			try {
+				models = includeAll({
+					dirname     :  path.join(config.appRoot, 'node_modules', pluginName, 'app', 'models'),
+					filter      :  /^([^\.].*)\.js$/
+				});
+			}
+			catch(e) {
+				models = {};
+			}
+			_.forOwn(models, function(model, modelName) {
+				model.identity = null;
+				// @todo convert multi word tables to underscores
+				if(model.identity) {
+					model.identity = pluginInfo.prefix.model+model.identity;
+				}
+				else {
+					model.identity = pluginInfo.prefix.model+modelName.toLowerCase();
+				}
+				model.connection = model.connection || defaultConnection;
+				var extendedModel = Waterline.Collection.extend(model);
+				self.waterline.loadCollection(extendedModel);
+			});
 		});
 
 		this.waterline.initialize({
