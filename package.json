@@ -14,6 +14,7 @@
     "mime": "^1.2.11",
     "optimist": "^0.6.1",
     "sails-disk": "^0.10.3",
+    "underscore-deep-extend": "0.0.5",
     "underscore.string": "^2.3.3",
     "url-pattern": "^0.6.0",
     "watch": "^0.11.0",

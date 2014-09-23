@@ -2,6 +2,8 @@ var includeAll = require('include-all');
 var path = require('path');
 var _ = require('lodash');
 var Waterline = require('waterline');
+var underscoreDeepExtend = require('underscore-deep-extend');
+_.mixin({deepExtend: underscoreDeepExtend(_)});
 
 module.exports = function(config) {
 	this.waterline = new Waterline();
@@ -64,7 +66,7 @@ module.exports = function(config) {
 
 				if(pluginInfo.config.hasOwnProperty('models')) {
 					if(pluginInfo.config.models.hasOwnProperty(modelName)) {
-						model = _.extend(model, pluginInfo.config.models[modelName]);
+						model = _.deepExtend(model, pluginInfo.config.models[modelName]);
 					}
 				}
 

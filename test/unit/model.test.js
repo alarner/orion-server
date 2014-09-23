@@ -47,6 +47,10 @@ describe('model', function() {
 				assert.isDefined(self.model.waterline);
 				assert.isDefined(models.test_test);
 				assert.isFunction(models.test_test.getById);
+				assert.isDefined(models.test_test.attributes.add);
+				assert.isDefined(models.test_test.attributes.replace);
+				assert.equal(models.test_test.attributes.replace.type, 'bool');
+				assert.equal(models.test_test.attributes.name.type, 'string');
 				done();
 			});
 		});
