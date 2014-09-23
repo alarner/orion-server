@@ -4,5 +4,8 @@ module.exports = {
 	},
 	test: function(req, res, models, config) {
 		res.end('Test!');
+	},
+	pluginPolicy: function(req, res, config) {
+		
 	}
 }

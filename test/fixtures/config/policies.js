@@ -9,6 +9,7 @@ module.exports = {
 	IndexController: {
 		'*!': ['index'],
 		'*': ['unspecifiedIndex'],
-		index: ['auth']
+		index: ['auth'],
+		pluginPolicy: ['orion-test-plugin::auth']
 	}
 };

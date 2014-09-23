@@ -49,6 +49,11 @@ describe('controller', function() {
 				controller.policySettings.HelloController.index,
 				['greeting', 'auth']
 			);
+
+			assert.deepEqual(
+				controller.policySettings.IndexController.pluginPolicy,
+				['greeting', 'index', 'orion-test-plugin::auth']
+			);
 		});
 	});
 
