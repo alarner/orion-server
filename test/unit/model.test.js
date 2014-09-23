@@ -39,5 +39,16 @@ describe('model', function() {
 				done();
 			});
 		});
+
+		it('should apply model overrides to plugin models', function(done) {
+			var self = this;
+			this.model.loadDatabase(function(err, models) {
+				assert.isNull(err);
+				assert.isDefined(self.model.waterline);
+				assert.isDefined(models.test_test);
+				assert.isFunction(models.test_test.getById);
+				done();
+			});
+		});
 	});
 });

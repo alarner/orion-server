@@ -1,3 +1,10 @@
 module.exports = {
-	key: 'value'
+	key: 'value',
+	models: {
+		Test: {
+			getById: function(id, cb) {
+				cb(123);
+			}
+		}
+	}
 };

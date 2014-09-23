@@ -61,6 +61,13 @@ module.exports = function(config) {
 					model.identity = pluginInfo.prefix.model+modelName.toLowerCase();
 				}
 				model.connection = model.connection || defaultConnection;
+
+				if(pluginInfo.config.hasOwnProperty('models')) {
+					if(pluginInfo.config.models.hasOwnProperty(modelName)) {
+						model = _.extend(model, pluginInfo.config.models[modelName]);
+					}
+				}
+
 				var extendedModel = Waterline.Collection.extend(model);
 				self.waterline.loadCollection(extendedModel);
 			});
