@@ -1,7 +1,7 @@
 var cluster = require('cluster');
 var winston = require('winston');
 var _ = require('lodash');
-var configLoader = require('./config');
+var configLoader = require('./config-loader');
 
 module.exports = function(appRoot) {
 	var Server = null;
