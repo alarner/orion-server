@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var async = require('async');
 var winston = require('winston');
+var watcher = require('./watcher');
 
 module.exports = function(cluster, config) {
 	
@@ -16,15 +17,16 @@ module.exports = function(cluster, config) {
 
 		// Watch for file changes and restart workers if the --watch flag is specified
 		if(self.config.argv && self.config.argv.hasOwnProperty('watch')) {
-			var watch = require('watch');
+			watcher(config.appRoot, self.refreshWorkers);
+			// var watch = require('watch');
 			
-			watch.watchTree(config.appRoot, function (f, curr, prev) {
-				if (typeof f == 'object' && prev === null && curr === null) {
-					// Finished walking the tree
-				} else {
-					self.refreshWorkers();
-				}
-			});
+			// watch.watchTree(config.appRoot, function (f, curr, prev) {
+			// 	if (typeof f == 'object' && prev === null && curr === null) {
+			// 		// Finished walking the tree
+			// 	} else {
+			// 		self.refreshWorkers();
+			// 	}
+			// });
 		}
 
 		// Fork workers.
