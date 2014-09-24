@@ -1,8 +1,11 @@
 var http = require('http');
+var async = require('async');
+var path = require('path');
 var Router = require('./router');
 var Controller = require('./controller');
 var Request = require('./request');
 var Response = require('./response');
+var View = require('./view');
 var Model = require('./model');
 
 
@@ -15,17 +18,25 @@ module.exports = function(cluster, config) {
 	this.start = function(cb) {
 		
 		var controller = new Controller(config);
-		controller.loadControllers(config.appRoot+'/app/controllers');
-		controller.loadPolicies(config.appRoot+'/app/policies');
+		controller.loadControllers(path.join(config.appRoot, '/app/controllers'));
+		controller.loadPolicies(path.join(config.appRoot, '/app/policies'));
 
 		var model = new Model(config);
 
-		model.loadDatabase(function(err, models) {
+		async.parallel({
+			models: model.loadDatabase,
+			layouts: function(cb) {
+				View.loadLayouts(
+					path.join(config.appRoot, '/layouts'),
+					cb
+				);
+			}
+		}, function(err, results) {
 			http.createServer(function(req, res) {
 				Request(req, res, config);
 				Response(req, res, config);
 				var routeInfo = router.route(req.method, req.url);
-				controller.run(req, res, routeInfo, models);
+				controller.run(req, res, routeInfo, results.models);
 			}).listen(config.webserver.port);
 			cluster.worker.send('orion::ready');
 		});
