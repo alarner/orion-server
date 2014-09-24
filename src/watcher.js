@@ -2,6 +2,7 @@ var chokidar = require('chokidar');
 var sass = require('node-sass');
 var path = require('path');
 var fs = require('fs');
+var mkdirp = require('mkdirp');
 
 module.exports = function(appRoot, refreshFunction) {
 	var watcher = chokidar.watch(appRoot, {
@@ -16,13 +17,17 @@ module.exports = function(appRoot, refreshFunction) {
 
 		var ext = path.extname(shortPath);
 		if((shortPath.substring(0, 6) == '/sass/' || shortPath.substring(0, 6) == '/scss/') && (ext == '.scss' || ext == '.sass')) {
-			var outFile = path.join(appRoot, 'public', 'css', path.basename(shortPath, ext)+'.css');
+			var outFile = path.join(appRoot, 'public', 'css', shortPath.substring(6, shortPath.length-5)+'.css');
 			sass.render({
 				file: file,
 				success: function(css) {
-					fs.writeFile(outFile, css, function (err) {
-						if(err) console.log(err);
-						console.log('Wrote sass file: '+outFile);
+					mkdirp(path.dirname(outFile), function(err) {
+						if(err) return console.log(err);
+
+						fs.writeFile(outFile, css, function (err) {
+							if(err) console.log(err);
+							console.log('Wrote sass file: '+outFile);
+						});
 					});
 				},
 				error: function(error) {
@@ -44,4 +49,3 @@ module.exports = function(appRoot, refreshFunction) {
 		.on('error', function(error) {console.error('Error happened', error);})
 
 };
-
