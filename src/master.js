@@ -1,4 +1,3 @@
-var argv = require('optimist').argv;
 var _ = require('lodash');
 var async = require('async');
 var winston = require('winston');
@@ -16,7 +15,7 @@ module.exports = function(cluster, config) {
 	this.start = function(cb) {
 
 		// Watch for file changes and restart workers if the --watch flag is specified
-		if(argv.hasOwnProperty('watch')) {
+		if(self.config.argv && self.config.argv.hasOwnProperty('watch')) {
 			var watch = require('watch');
 			
 			watch.watchTree(config.appRoot, function (f, curr, prev) {

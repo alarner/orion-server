@@ -2,6 +2,8 @@ var express = require('express');
 var path = require('path');
 var includeAll = require('include-all');
 var _ = require('lodash');
+var argv = require('optimist').argv;
+
 module.exports = function(appRoot) {
 	var self = this;
 
@@ -40,5 +42,6 @@ module.exports = function(appRoot) {
 	});
 	config.appRoot = appRoot;
 	config.express = {app: express()};
+	config.argv = argv || {};
 	return config;
 };
