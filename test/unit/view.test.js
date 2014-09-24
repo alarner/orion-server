@@ -18,6 +18,23 @@ describe('view', function() {
 		Response(this.req, this.res, this.config);
 	});
 
+	describe('when we call view.loadLayouts', function() {
+		it('should load all of the layouts', function(done) {
+			var self = this;
+			this.res.send = sinon.spy();
+			View.loadLayouts(path.join(this.config.appRoot, 'layouts'), function(err) {
+				View.render(self.req, self.res, self.config, 'index/with-layout', {name: 'Aaron'}, function() {
+					assert(
+						self.res.send.calledWith(
+							fs.readFileSync(path.join(__dirname, '../fixtures/layouts/subdir/layout.hbs')).toString()
+						),
+						'Layout renders properly');
+					done();
+				});
+			});
+		});
+	});
+
 	describe('when we call view.render()', function() {
 		describe('with no path or params', function() {
 			describe('and the request is good', function() {
@@ -25,8 +42,10 @@ describe('view', function() {
 					var self = this;
 					this.res.send = sinon.spy();
 					View.render(this.req, this.res, this.config, undefined, undefined, function() {
-						self.res.send.calledWith(
-							fs.readFileSync(path.join(__dirname, '../fixtures/views/index/index.hbs')).toString()
+						assert(
+							self.res.send.calledWith(
+								fs.readFileSync(path.join(__dirname, '../fixtures/views/index/index.hbs')).toString()
+							)
 						);
 						done();
 					});
@@ -38,7 +57,7 @@ describe('view', function() {
 					this.res.error = sinon.spy();
 					delete this.req.info;
 					View.render(this.req, this.res, this.config, undefined, undefined, function() {
-						self.res.error.calledWith('Missing request info.');
+						assert(self.res.error.calledWith('Missing request info.'));
 						done();
 					});
 				});
@@ -52,8 +71,8 @@ describe('view', function() {
 					delete this.req.info;
 					var viewPath = 'nonexistant/view';
 					View.render(this.req, this.res, this.config, viewPath, undefined, function(err) {
-						var errMessage = 'Could not find view: '+path.join(self.config.appRoot, 'views', viewPath);
-						self.res.error.calledWith(errMessage, 404);
+						var errMessage = 'Could not find view: '+path.join(self.config.appRoot, 'views', viewPath+'.hbs');
+						assert(self.res.error.calledWith(errMessage, 404));
 						done();
 					});
 				});
@@ -63,7 +82,7 @@ describe('view', function() {
 					var self = this;
 					this.res.send = sinon.spy();
 					View.render(this.req, this.res, this.config, 'index/greeting', {name: 'Aaron'}, function() {
-						self.res.send.calledWith('Hello Aaron');
+						assert(self.res.send.calledWith('Hello Aaron'));
 						done();
 					});
 				});

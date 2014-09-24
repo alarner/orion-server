@@ -3,9 +3,36 @@ var _ = require('lodash');
 var path = require('path');
 var fs = require('fs');
 var async = require('async');
+var recursive = require('recursive-readdir');
+
+require('handlebars-layouts')(Handlebars);
 
 var View = {
 	cache: {},
+	loadLayouts: function(layoutRoot, cb) {
+		recursive(layoutRoot, function(err, files) {
+			if(err) return cb(err);
+			async.each(
+				files,
+				function(file, cb) {
+					fs.readFile(file, function(err, layout) {
+						if(err) return cb(err);
+						
+						Handlebars.registerPartial(
+							file.substring(layoutRoot.length+1, file.length-4),
+							layout.toString()
+						);
+						cb();
+					});
+				},
+				cb
+			);
+			
+			// // Files is an array of filename
+			// console.log(files);
+			// cb();
+		});
+	},
 	render: function(req, res, config, viewPath, params, cb) {
 		var params = params || {};
 
@@ -33,7 +60,7 @@ var View = {
 		// Use the path that was passed in. Make it relative to appRoot/views 
 		// unless it's an absolute path.
 		else if(viewPath.charAt(0) != '/') {
-			viewPath = path.join(config.appRoot, 'views', viewPath);
+			viewPath = path.join(config.appRoot, 'views', viewPath+'.hbs');
 		}
 
 		async.series({
