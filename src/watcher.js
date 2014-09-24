@@ -15,7 +15,7 @@ module.exports = function(appRoot, refreshFunction) {
 		if(shortPath.substring(0, 8) == '/public/') return;
 
 		var ext = path.extname(shortPath);
-		if(shortPath.substring(0, 6) == '/sass/' && (ext == '.scss' || ext == '.sass')) {
+		if((shortPath.substring(0, 6) == '/sass/' || shortPath.substring(0, 6) == '/scss/') && (ext == '.scss' || ext == '.sass')) {
 			var outFile = path.join(appRoot, 'public', 'css', path.basename(shortPath, ext)+'.css');
 			sass.render({
 				file: file,
