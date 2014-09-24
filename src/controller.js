@@ -3,9 +3,14 @@ var async = require('async');
 var _ = require('lodash');
 var winston = require('winston');
 var path = require('path');
+var serveStatic = require('serve-static');
 
 module.exports = function(config) {
 	var self = this;
+	var staticMiddleware = serveStatic(
+		path.join(config.appRoot, 'public'), 
+		config['static']
+	);
 
 	this.cachedControllers = {};
 	this.cachedPolicies = {};
@@ -24,22 +29,31 @@ module.exports = function(config) {
 	};
 	
 	this.run = function(req, res, info, models) {
-		req.info = info;
-		self.prepare(req, res, function(err) {
-			if(!self.cachedControllers.hasOwnProperty(info.controller))
-				return res.notFound();
-			if(!self.cachedControllers[info.controller].hasOwnProperty(info.action))
-				return res.notFound();
+		async.series([
+			function(cb) {
+				if(!config.argv || !config.argv.hasOwnProperty('static') || !config.argv['static'])
+					return cb();
+				
+				staticMiddleware(req, res, cb);
+			}
+		], function(err, cb) {
+			req.info = info;
+			self.prepare(req, res, function(err) {
+				if(!self.cachedControllers.hasOwnProperty(info.controller))
+					return res.notFound();
+				if(!self.cachedControllers[info.controller].hasOwnProperty(info.action))
+					return res.notFound();
 
-			async.eachSeries(
-				self.policySettings[info.controller][info.action],
-				function(policyName, cb) {
-					return self.cachedPolicies[policyName](req, res, models, config, cb);
-				},
-				function(err) {
-					self.cachedControllers[info.controller][info.action](req, res, models, config);
-				}
-			);
+				async.eachSeries(
+					self.policySettings[info.controller][info.action],
+					function(policyName, cb) {
+						return self.cachedPolicies[policyName](req, res, models, config, cb);
+					},
+					function(err) {
+						self.cachedControllers[info.controller][info.action](req, res, models, config);
+					}
+				);
+			});
 		});
 	};
 
