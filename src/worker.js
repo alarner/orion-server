@@ -24,7 +24,9 @@ module.exports = function(cluster, config) {
 		var model = new Model(config);
 
 		async.parallel({
-			models: model.loadDatabase,
+			models: function(cb) {
+				model.loadDatabase(cb);
+			},
 			layouts: function(cb) {
 				View.loadLayouts(
 					path.join(config.appRoot, '/layouts'),
