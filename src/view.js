@@ -1,4 +1,4 @@
-var ejs = require('ejs');
+var Handlebars = require('handlebars');
 var _ = require('lodash');
 var path = require('path');
 var fs = require('fs');
@@ -27,7 +27,7 @@ var View = {
 				config.appRoot,
 				'views',
 				controllerName,
-				req.info.action.toLowerCase()+'.ejs'
+				req.info.action.toLowerCase()+'.hbs'
 			);
 		}
 		// Use the path that was passed in. Make it relative to appRoot/views 
@@ -44,7 +44,7 @@ var View = {
 				fs.readFile(viewPath, function(err, viewData) {
 					if(err) return cb(err);
 					
-					var compiled = ejs.compile(viewData.toString(), config.view);
+					var compiled = Handlebars.compile(viewData.toString());
 					if(!compiled) return cb('Unable to compile view.');
 					View.cache[viewPath] = compiled;
 					cb(null, compiled);

@@ -26,7 +26,7 @@ describe('view', function() {
 					this.res.send = sinon.spy();
 					View.render(this.req, this.res, this.config, undefined, undefined, function() {
 						self.res.send.calledWith(
-							fs.readFileSync(path.join(__dirname, '../fixtures/views/index/index.ejs')).toString()
+							fs.readFileSync(path.join(__dirname, '../fixtures/views/index/index.hbs')).toString()
 						);
 						done();
 					});
@@ -76,7 +76,7 @@ describe('view', function() {
 				this.res.send = sinon.spy();
 				View.render(this.req, this.res, this.config, undefined, undefined, function() {
 					View.render(self.req, self.res, self.config, undefined, undefined, function() {	
-						var viewPath = path.join(self.config.appRoot, 'views', 'index', 'index.ejs');
+						var viewPath = path.join(self.config.appRoot, 'views', 'index', 'index.hbs');
 						assert(View.cache.hasOwnProperty(viewPath));
 						done();
 					});
