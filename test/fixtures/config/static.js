@@ -28,5 +28,5 @@ module.exports = {
 	// function setHeaders(res, path) {
 	// 	res.setHeader('Content-Disposition', contentDisposition(path))
 	// }
-	setHeaders: '%>'
+	setHeaders: false
 };
