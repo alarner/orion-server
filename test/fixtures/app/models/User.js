@@ -1,3 +1,9 @@
 module.exports = {
-	attributes: {}
+	attributes: {
+		email: { type: 'string' },
+		authOptions: {
+			collection: 'UserAuthOption',
+			via: 'userId'
+		}
+	}
 };

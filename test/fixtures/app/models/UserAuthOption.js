@@ -1,3 +1,5 @@
 module.exports = {
-	attributes: {}
+	attributes: {
+		userId: { type: 'integer' }
+	}
 };

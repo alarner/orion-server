@@ -66,5 +66,12 @@ describe('model', function() {
 				done();
 			});
 		});
+
+		it('should correctly replace association names', function(done) {
+			this.model.loadDatabase(function(err, models) {
+				assert.equal(models.user._attributes.authOptions.collection, 'user_auth_option');
+				done();
+			});
+		});
 	});
 });

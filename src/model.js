@@ -8,6 +8,7 @@ _.mixin({deepExtend: underscoreDeepExtend(_)});
 
 module.exports = function(config) {
 	this.waterline = new Waterline();
+	// @todo: refactor this logic to be recursive
 	this.loadDatabase = function(cb) {
 		var self = this;
 		var adapters = config.database.adapters || {};
@@ -36,11 +37,31 @@ module.exports = function(config) {
 			filter      :  /^([^\.].*)\.js$/
 		});
 		_.forOwn(models, function(model, modelName) {
-			model.identity = model.identity || changeCase.snakeCase(modelName); // @todo convert multi word tables to underscores
+			model.identity = model.identity || changeCase.snakeCase(modelName);
 			model.connection = model.connection || defaultConnection;
+		});
+
+		// Loop through models to update any association names and
+		// tell waterline to load the collection
+		var err = false;
+		_.forOwn(models, function(model, modelName) {
+			if(model.hasOwnProperty('attributes')) {
+				_.forOwn(model.attributes, function(attribute, attributeName) {
+					if(!attribute.hasOwnProperty('collection')) return;
+					if(!models.hasOwnProperty(attribute.collection)) {
+						err = 'Could not find associated model "'+attribute.collection+'" in "'+modelName+'"';
+						return;
+					}
+
+					attribute.collection = models[attribute.collection].identity;
+
+				});
+			}
+
 			var extendedModel = Waterline.Collection.extend(model);
 			self.waterline.loadCollection(extendedModel);
 		});
+		if(err) return cb(err);
 
 		// Fill in attributes on plugin models
 		_.forOwn(config.plugins, function(pluginInfo, pluginName) {
@@ -56,9 +77,8 @@ module.exports = function(config) {
 			}
 			_.forOwn(models, function(model, modelName) {
 				model.identity = null;
-				// @todo convert multi word tables to underscores
 				if(model.identity) {
-					model.identity = pluginInfo.prefix.model+model.identity;
+					model.identity = pluginInfo.prefix.model+changeCase.snakeCase(model.identity);
 				}
 				else {
 					model.identity = pluginInfo.prefix.model+changeCase.snakeCase(modelName);
