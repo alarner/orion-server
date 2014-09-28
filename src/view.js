@@ -51,16 +51,16 @@ var View = {
 				.toLowerCase();
 
 			viewPath = path.join(
-				config.appRoot,
+				config.root,
 				'views',
 				controllerName,
 				req.info.action.toLowerCase()+'.hbs'
 			);
 		}
-		// Use the path that was passed in. Make it relative to appRoot/views 
+		// Use the path that was passed in. Make it relative to root/views 
 		// unless it's an absolute path.
 		else if(viewPath.charAt(0) != '/') {
-			viewPath = path.join(config.appRoot, 'views', viewPath+'.hbs');
+			viewPath = path.join(config.root, 'views', viewPath+'.hbs');
 		}
 
 		async.series({

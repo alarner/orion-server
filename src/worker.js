@@ -18,8 +18,8 @@ module.exports = function(cluster, config) {
 	this.start = function(cb) {
 		
 		var controller = new Controller(config);
-		controller.loadControllers(path.join(config.appRoot, '/app/controllers'));
-		controller.loadPolicies(path.join(config.appRoot, '/app/policies'));
+		controller.loadControllers(path.join(config.root, '/app/controllers'));
+		controller.loadPolicies(path.join(config.root, '/app/policies'));
 
 		var model = new Model(config);
 
@@ -29,7 +29,7 @@ module.exports = function(cluster, config) {
 			},
 			layouts: function(cb) {
 				View.loadLayouts(
-					path.join(config.appRoot, '/layouts'),
+					path.join(config.root, '/layouts'),
 					cb
 				);
 			}

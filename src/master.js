@@ -17,16 +17,7 @@ module.exports = function(cluster, config) {
 
 		// Watch for file changes and restart workers if the --watch flag is specified
 		if(self.config.argv && self.config.argv.hasOwnProperty('watch')) {
-			watcher(config.appRoot, self.refreshWorkers);
-			// var watch = require('watch');
-			
-			// watch.watchTree(config.appRoot, function (f, curr, prev) {
-			// 	if (typeof f == 'object' && prev === null && curr === null) {
-			// 		// Finished walking the tree
-			// 	} else {
-			// 		self.refreshWorkers();
-			// 	}
-			// });
+			watcher(config.root, self.refreshWorkers);
 		}
 
 		// Fork workers.

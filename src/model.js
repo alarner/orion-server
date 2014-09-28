@@ -33,7 +33,7 @@ module.exports = function(config) {
 
 		// Fill in attributes on app models
 		var models = includeAll({
-			dirname     :  path.join(config.appRoot, 'app', 'models'),
+			dirname     :  path.join(config.root, 'app', 'models'),
 			filter      :  /^([^\.].*)\.js$/
 		});
 		_.forOwn(models, function(model, modelName) {
@@ -64,11 +64,11 @@ module.exports = function(config) {
 		if(err) return cb(err);
 
 		// Fill in attributes on plugin models
-		_.forOwn(config.plugins, function(pluginInfo, pluginName) {
+		_.forOwn(config.plugins, function(pluginConfig, pluginName) {
 			var models = null;
 			try {
 				models = includeAll({
-					dirname     :  path.join(config.appRoot, 'node_modules', pluginName, 'app', 'models'),
+					dirname     :  path.join(config.root, 'node_modules', pluginName, 'app', 'models'),
 					filter      :  /^([^\.].*)\.js$/
 				});
 			}
@@ -78,16 +78,16 @@ module.exports = function(config) {
 			_.forOwn(models, function(model, modelName) {
 				model.identity = null;
 				if(model.identity) {
-					model.identity = pluginInfo.prefix.model+changeCase.snakeCase(model.identity);
+					model.identity = pluginConfig.prefix.model+changeCase.snakeCase(model.identity);
 				}
 				else {
-					model.identity = pluginInfo.prefix.model+changeCase.snakeCase(modelName);
+					model.identity = pluginConfig.prefix.model+changeCase.snakeCase(modelName);
 				}
 				model.connection = model.connection || defaultConnection;
 
-				if(pluginInfo.config.hasOwnProperty('models')) {
-					if(pluginInfo.config.models.hasOwnProperty(modelName)) {
-						model = _.deepExtend(model, pluginInfo.config.models[modelName]);
+				if(pluginConfig.hasOwnProperty('models')) {
+					if(pluginConfig.models.hasOwnProperty(modelName)) {
+						model = _.deepExtend(model, pluginConfig.models[modelName]);
 					}
 				}
 

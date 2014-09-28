@@ -46,6 +46,8 @@ var configLoader = function(root, pluginInfo) {
 		};
 	}
 
+	config.prefix = pluginInfo.prefix;
+
 	_.forOwn(config.plugins, function(pluginInfo, pluginName) {
 		pluginInfo.name = pluginName;
 		var pluginConfig = configLoader(path.join(root, 'node_modules', pluginName), pluginInfo);

@@ -8,7 +8,7 @@ var serveStatic = require('serve-static');
 module.exports = function(config) {
 	var self = this;
 	var staticMiddleware = serveStatic(
-		path.join(config.appRoot, 'public'), 
+		path.join(config.root, 'public'), 
 		config['static']
 	);
 
@@ -123,7 +123,7 @@ module.exports = function(config) {
 	this.loadPolicies = function() {
 		// Load app policies
 		self.cachedPolicies = includeAll({
-			dirname     :  path.join(config.appRoot, 'app', 'policies'),
+			dirname     :  path.join(config.root, 'app', 'policies'),
 			filter      :  /^([^\.].*)\.js$/
 		});
 
@@ -132,7 +132,7 @@ module.exports = function(config) {
 			var policies = null;
 			try {
 				policies = includeAll({
-					dirname     :  path.join(config.appRoot, 'node_modules', pluginName, 'app', 'policies'),
+					dirname     :  path.join(config.root, 'node_modules', pluginName, 'app', 'policies'),
 					filter      :  /^([^\.].*)\.js$/
 				});
 			}

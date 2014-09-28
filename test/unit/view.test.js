@@ -22,7 +22,7 @@ describe('view', function() {
 		it('should load all of the layouts', function(done) {
 			var self = this;
 			this.res.send = sinon.spy();
-			View.loadLayouts(path.join(this.config.appRoot, 'layouts'), function(err) {
+			View.loadLayouts(path.join(this.config.root, 'layouts'), function(err) {
 				View.render(self.req, self.res, self.config, 'index/with-layout', {name: 'Aaron'}, function() {
 					assert(
 						self.res.send.calledWith(
@@ -71,7 +71,7 @@ describe('view', function() {
 					delete this.req.info;
 					var viewPath = 'nonexistant/view';
 					View.render(this.req, this.res, this.config, viewPath, undefined, function(err) {
-						var errMessage = 'Could not find view: '+path.join(self.config.appRoot, 'views', viewPath+'.hbs');
+						var errMessage = 'Could not find view: '+path.join(self.config.root, 'views', viewPath+'.hbs');
 						assert(self.res.error.calledWith(errMessage, 404));
 						done();
 					});
@@ -95,7 +95,7 @@ describe('view', function() {
 				this.res.send = sinon.spy();
 				View.render(this.req, this.res, this.config, undefined, undefined, function() {
 					View.render(self.req, self.res, self.config, undefined, undefined, function() {	
-						var viewPath = path.join(self.config.appRoot, 'views', 'index', 'index.hbs');
+						var viewPath = path.join(self.config.root, 'views', 'index', 'index.hbs');
 						assert(View.cache.hasOwnProperty(viewPath));
 						done();
 					});

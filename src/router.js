@@ -71,15 +71,15 @@ module.exports = function(config) {
 		self.addRoutes(config.router.routes, self.routes, null, null, false);
 
 		// Add plugin routes
-		_.forOwn(config.plugins, function(info, name) {
-			if(!info.config.router) info.config.router = {};
-			if(!info.config.router.routes) info.config.router.routes = {};
+		_.forOwn(config.plugins, function(pluginConfig, name) {
+			if(!pluginConfig.router) pluginConfig.router = {};
+			if(!pluginConfig.router.routes) pluginConfig.router.routes = {};
 
 			self.addRoutes(
-				info.config.router.routes,
+				pluginConfig.router.routes,
 				self.routes,
 				name,
-				info.prefix.route,
+				pluginConfig.prefix.route,
 				true
 			);
 		});

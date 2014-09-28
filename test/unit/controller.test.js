@@ -23,7 +23,7 @@ describe('controller', function() {
 	describe('when we call controller.loadControllers', function() {
 		it('should load all of the controllers', function() {
 			var controller = new Controller(this.config);
-			controller.loadControllers(path.join(this.config.appRoot, 'app', 'controllers'));
+			controller.loadControllers(path.join(this.config.root, 'app', 'controllers'));
 
 			assert.isDefined(controller.cachedControllers.IndexController);
 			assert.isDefined(controller.cachedControllers.HelloController);
@@ -33,7 +33,7 @@ describe('controller', function() {
 
 		it('should load all of the policies for each controller', function() {
 			var controller = new Controller(this.config);
-			controller.loadControllers(path.join(this.config.appRoot, 'app', 'controllers'));
+			controller.loadControllers(path.join(this.config.root, 'app', 'controllers'));
 
 			assert.deepEqual(
 				controller.policySettings.IndexController.index,

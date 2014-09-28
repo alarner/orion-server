@@ -12,7 +12,7 @@ describe('router', function() {
 			assert.isDefined(this.config.plugins);
 			assert.isDefined(this.config.plugins['orion-test-plugin']);
 			assert.isDefined(this.config.plugins['orion-test-plugin'].prefix);
-			assert.isDefined(this.config.plugins['orion-test-plugin'].config);
+			assert.isDefined(this.config.plugins['orion-test-plugin'].express);
 		});
 	})
 

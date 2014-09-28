@@ -3,7 +3,7 @@ var winston = require('winston');
 var _ = require('lodash');
 var configLoader = require('./config-loader');
 
-module.exports = function(appRoot) {
+module.exports = function(root) {
 	var Server = null;
 	if(cluster.isMaster) {
 		console.log('isMaster');
@@ -14,7 +14,7 @@ module.exports = function(appRoot) {
 	}
 
 	// Load configuration files
-	var config = configLoader(appRoot);
+	var config = configLoader(root);
 
 	// Set up logger options
 	_.forOwn(config.logger, function(value, key) {
