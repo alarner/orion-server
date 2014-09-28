@@ -6,6 +6,44 @@ var changeCase = require('change-case');
 var underscoreDeepExtend = require('underscore-deep-extend');
 _.mixin({deepExtend: underscoreDeepExtend(_)});
 
+var loadModels = function(pluginPath, config, defaultConnection, models) {
+	models = models || [];
+
+	// Load models
+	var rawModels = {};
+	try {
+		rawModels = includeAll({
+			dirname     :  path.join(config.root, 'app', 'models'),
+			filter      :  /^([^\.].*)\.js$/
+		});
+	}
+	catch(e) {
+		rawModels = {};
+	}
+
+	_.forOwn(rawModels, function(model, modelName) {
+		if(config.hasOwnProperty('models') && config.models.hasOwnProperty(modelName)) {
+			model = _.deepExtend(model, config.models[modelName]);
+		}
+		model.identity = model.identity || config.prefix.model+changeCase.snakeCase(modelName);
+		model.connection = model.connection || defaultConnection;
+		model.__orion = {
+			pluginPath: pluginPath,
+			originalName: modelName
+		};
+		models.push(model);
+	});
+
+	_.forOwn(config.plugins, function(pluginConfig, pluginName) {
+		var subpluginPath = pluginPath.slice(0);
+		subpluginPath.push(pluginName);
+		loadModels(subpluginPath, pluginConfig, defaultConnection, models);
+	});
+
+
+	return models;
+};
+
 module.exports = function(config) {
 	this.waterline = new Waterline();
 	// @todo: refactor this logic to be recursive
@@ -31,78 +69,58 @@ module.exports = function(config) {
 		if(!defaultConnection)
 			return cb('You must specify at least one connection in config/database.js');
 
-		// Fill in attributes on app models
-		var models = includeAll({
-			dirname     :  path.join(config.root, 'app', 'models'),
-			filter      :  /^([^\.].*)\.js$/
-		});
-		_.forOwn(models, function(model, modelName) {
-			model.identity = model.identity || changeCase.snakeCase(modelName);
-			model.connection = model.connection || defaultConnection;
+		var models = loadModels([], config, defaultConnection);
+
+		// Key models wth their pluginPath
+		var keyedModels = {};
+		_.each(models, function(model) {
+			var key = model.__orion.originalName;
+			if(model.__orion.pluginPath.length > 0) {
+				key = model.__orion.pluginPath.join('::')+'::'+model.__orion.originalName;
+			}
+			keyedModels[key] = model;
 		});
 
 		// Loop through models to update any association names and
 		// tell waterline to load the collection
 		var err = false;
-		_.forOwn(models, function(model, modelName) {
-			if(model.hasOwnProperty('attributes')) {
-				_.forOwn(model.attributes, function(attribute, attributeName) {
-					if(!attribute.hasOwnProperty('collection')) return;
-					if(!models.hasOwnProperty(attribute.collection)) {
-						err = 'Could not find associated model "'+attribute.collection+'" in "'+modelName+'"';
-						return;
-					}
+		_.each(models, function(model) {
+			if(!model.hasOwnProperty('attributes'))
+				model.attributes = {};
 
-					attribute.collection = models[attribute.collection].identity;
+			_.forOwn(model.attributes, function(attribute, attributeName) {
+				if(!attribute.hasOwnProperty('collection')) return;
 
-				});
-			}
+				if(!keyedModels.hasOwnProperty(attribute.collection)) {
+					err = 'Could not find associated model "'+attribute.collection+'" in "'+model.__orion.originalName+'"';
+					return;
+				}
+
+				attribute.collection = keyedModels[attribute.collection].identity;
+			});
 
 			var extendedModel = Waterline.Collection.extend(model);
 			self.waterline.loadCollection(extendedModel);
 		});
 		if(err) return cb(err);
 
-		// Fill in attributes on plugin models
-		_.forOwn(config.plugins, function(pluginConfig, pluginName) {
-			var models = null;
-			try {
-				models = includeAll({
-					dirname     :  path.join(config.root, 'node_modules', pluginName, 'app', 'models'),
-					filter      :  /^([^\.].*)\.js$/
-				});
-			}
-			catch(e) {
-				models = {};
-			}
-			_.forOwn(models, function(model, modelName) {
-				model.identity = null;
-				if(model.identity) {
-					model.identity = pluginConfig.prefix.model+changeCase.snakeCase(model.identity);
-				}
-				else {
-					model.identity = pluginConfig.prefix.model+changeCase.snakeCase(modelName);
-				}
-				model.connection = model.connection || defaultConnection;
-
-				if(pluginConfig.hasOwnProperty('models')) {
-					if(pluginConfig.models.hasOwnProperty(modelName)) {
-						model = _.deepExtend(model, pluginConfig.models[modelName]);
-					}
-				}
-
-				var extendedModel = Waterline.Collection.extend(model);
-				self.waterline.loadCollection(extendedModel);
-			});
-		});
-
 		this.waterline.initialize({
 			adapters: adapters,
 			connections: connections
 		}, function(err, ontology) {
 			if(err) return cb(err);
-			if(!global.model) global.model = {};
-			cb(null, ontology.collections);
+			var models = {};
+			_.forOwn(ontology.collections, function(model, name) {
+				if(!model.__orion) return;
+
+				var key = model.__orion.originalName;
+				if(model.__orion.pluginPath.length > 0) {
+					key = model.__orion.pluginPath.join('::')+'::'+model.__orion.originalName;
+				}
+
+				models[key] = model;
+			});
+			cb(null, models);
 		});
 	};
 };

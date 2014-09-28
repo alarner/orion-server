@@ -24,8 +24,7 @@ describe('model', function() {
 			var self = this;
 			this.model.loadDatabase(function(err, models) {
 				assert.isNull(err);
-				assert.isDefined(self.model.waterline);
-				assert.isDefined(models.user);
+				assert.isDefined(models.User);
 				done();
 			});
 		});
@@ -34,8 +33,7 @@ describe('model', function() {
 			var self = this;
 			this.model.loadDatabase(function(err, models) {
 				assert.isNull(err);
-				assert.isDefined(self.model.waterline);
-				assert.isDefined(models.test_test);
+				assert.isDefined(models['orion-test-plugin::Test']);
 				done();
 			});
 		});
@@ -44,10 +42,12 @@ describe('model', function() {
 			var self = this;
 			this.model.loadDatabase(function(err, models) {
 				assert.isNull(err);
-				assert.isDefined(self.model.waterline);
-				assert.isDefined(models.user_auth_option);
-				assert.isDefined(models.user_auth_type);
-				assert.isDefined(models.test_test_test);
+				assert.isDefined(models.UserAuthOption);
+				assert.equal(models.UserAuthOption.identity, 'user_auth_option');
+				assert.isDefined(models.userAuthType);
+				assert.equal(models.userAuthType.identity, 'user_auth_type');
+				assert.isDefined(models['orion-test-plugin::Test']);
+				assert.equal(models['orion-test-plugin::Test'].identity, 'test_test');
 				done();
 			});
 		});
@@ -56,22 +56,21 @@ describe('model', function() {
 			var self = this;
 			this.model.loadDatabase(function(err, models) {
 				assert.isNull(err);
-				assert.isDefined(self.model.waterline);
-				assert.isDefined(models.test_test);
-				assert.isFunction(models.test_test.getById);
-				assert.isDefined(models.test_test.attributes.add);
-				assert.isDefined(models.test_test.attributes.replace);
-				assert.equal(models.test_test.attributes.replace.type, 'bool');
-				assert.equal(models.test_test.attributes.name.type, 'string');
+				assert.isDefined(models['orion-test-plugin::Test']);
+				assert.isFunction(models['orion-test-plugin::Test'].getById);
+				assert.isDefined(models['orion-test-plugin::Test'].attributes.add);
+				assert.isDefined(models['orion-test-plugin::Test'].attributes.replace);
+				assert.equal(models['orion-test-plugin::Test'].attributes.replace.type, 'bool');
+				assert.equal(models['orion-test-plugin::Test'].attributes.name.type, 'string');
 				done();
 			});
 		});
 
-		it('should correctly replace association names', function(done) {
-			this.model.loadDatabase(function(err, models) {
-				assert.equal(models.user._attributes.authOptions.collection, 'user_auth_option');
-				done();
-			});
-		});
+		// it('should correctly replace association names', function(done) {
+		// 	this.model.loadDatabase(function(err, models) {
+		// 		assert.equal(models.user._attributes.authOptions.collection, 'user_auth_option');
+		// 		done();
+		// 	});
+		// });
 	});
 });

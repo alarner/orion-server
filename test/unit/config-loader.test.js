@@ -90,5 +90,9 @@ describe('config-loader', function() {
 			assert.isDefined(subpluginConfig.express.app);
 			assert.isDefined(config.argv);
 		});
+
+		it('should set the default plugin model prefix to an empty string', function() {
+			assert.equal(config.prefix.model, '');
+		});
 	});
 });

@@ -34,6 +34,7 @@ var configLoader = function(root, pluginInfo) {
 	config.root = root;
 	config.express = {app: express()};
 	config.argv = argv || {};
+	config.plugins = config.plugins || {};
 
 	if(!pluginInfo) {
 		pluginInfo = {};
@@ -42,7 +43,7 @@ var configLoader = function(root, pluginInfo) {
 	if(!pluginInfo.hasOwnProperty('prefix')) {
 		pluginInfo.prefix = {
 			route: '/'+(pluginInfo.name || ''),
-			model: (pluginInfo.name || '')+'_'
+			model: pluginInfo.name || ''
 		};
 	}
 
