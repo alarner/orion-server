@@ -4,44 +4,63 @@ var includeAll = require('include-all');
 var _ = require('lodash');
 var argv = require('optimist').argv;
 
-module.exports = function(appRoot) {
+var configLoader = function(root, pluginInfo) {
 	var self = this;
 
 	// Load app configuration files
-	var config = includeAll({
-		dirname     :  path.join(appRoot, 'config'),
-		filter      :  /^([^\.].*)\.js$/
-	});
+	var config = {};
+	try {
+		config = includeAll({
+			dirname     :  path.join(root, 'config'),
+			filter      :  /^([^\.].*)\.js$/
+		});
+	}
+	catch(e) {
+		config = {};
+	}
 
+	var pluginOverrides = {};
 	// Load plugin override configuration files
-	var pluginOverrides = includeAll({
-		dirname     :  path.join(appRoot, 'config', 'plugins'),
-		filter      :  /^([^\.].*)\.js$/
-	});
+	try {
+		pluginOverrides = includeAll({
+			dirname     :  path.join(root, 'config', 'plugins'),
+			filter      :  /^([^\.].*)\.js$/
+		});
+	}
+	catch(e) {
+		pluginOverrides = {};
+	}
+
+	config.root = root;
+	config.express = {app: express()};
+	config.argv = argv || {};
+
+	if(!pluginInfo) {
+		pluginInfo = {};
+	}
+
+	if(!pluginInfo.hasOwnProperty('prefix')) {
+		pluginInfo.prefix = {
+			route: '/'+(pluginInfo.name || ''),
+			model: (pluginInfo.name || '')+'_'
+		};
+	}
 
 	_.forOwn(config.plugins, function(pluginInfo, pluginName) {
-		if(!pluginInfo.hasOwnProperty('prefix'))
-			pluginInfo.prefix = '/'+pluginName;
-
-		try {
-			config.plugins[pluginName].config = includeAll({
-				dirname     :  path.join(appRoot, 'node_modules', pluginName, 'config'),
-				filter      :  /^([^\.].*)\.js$/
-			});
-		}
-		catch(e) {
-			config.plugins[pluginName].config = {};
-		}
+		pluginInfo.name = pluginName;
+		var pluginConfig = configLoader(path.join(root, 'node_modules', pluginName), pluginInfo);
 
 		if(pluginOverrides.hasOwnProperty(pluginName)) {
-			config.plugins[pluginName].config = _.extend(
-				config.plugins[pluginName].config,
+			pluginConfig = _.extend(
+				pluginConfig,
 				pluginOverrides[pluginName]
 			);
 		}
+
+		config.plugins[pluginName] = pluginConfig;
 	});
-	config.appRoot = appRoot;
-	config.express = {app: express()};
-	config.argv = argv || {};
+
 	return config;
 };
+
+module.exports = configLoader;
