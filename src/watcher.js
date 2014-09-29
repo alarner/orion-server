@@ -4,6 +4,7 @@ var path = require('path');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
 var winston = require('winston');
+var _ = require('lodash');
 
 module.exports = function(config, refreshFunction) {
 	var options = {

@@ -17,7 +17,7 @@ module.exports = function(cluster, config) {
 
 		// Watch for file changes and restart workers if the --watch flag is specified
 		if(self.config.argv && self.config.argv.hasOwnProperty('watch')) {
-			watcher(config.root, self.refreshWorkers);
+			watcher(config, self.refreshWorkers);
 		}
 
 		// Fork workers.
