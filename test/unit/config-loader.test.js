@@ -89,6 +89,8 @@ describe('config-loader', function() {
 			assert.isDefined(subpluginConfig.express);
 			assert.isDefined(subpluginConfig.express.app);
 			assert.isDefined(config.argv);
+			assert.equal(subpluginConfig.prefix.model, 'test_sub_', 'Plugin model prefixes are not chained');
+			assert.equal(subpluginConfig.prefix.route, '/test/sub', 'Plugin route prefixes are not chained');
 		});
 
 		it('should set the default plugin model prefix to an empty string', function() {

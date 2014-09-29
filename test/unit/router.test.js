@@ -128,5 +128,30 @@ describe('router', function() {
 				assert.equal(routeInfo.prefix, false);
 			});
 		});
+
+		describe('with a url that matches a sub-plugin route', function() {
+			it('should return that sub-plugin route', function() {
+				var router = new Router(this.config);
+				router.loadRoutes(this.config.router.routes);
+
+				var routeInfo = router.route('get', '/test');
+				assert.equal(routeInfo.controller, 'IndexController');
+				assert.equal(routeInfo.action, 'index');
+				assert.equal(routeInfo.plugin, 'orion-test-plugin');
+				assert.equal(routeInfo.prefix, '/test');
+
+				var routeInfo = router.route('get', '/test/face/book');
+				assert.equal(routeInfo.controller, 'FaceController');
+				assert.equal(routeInfo.action, 'book');
+				assert.equal(routeInfo.plugin, 'orion-test-plugin');
+				assert.equal(routeInfo.prefix, '/test');
+
+				var routeInfo = router.route('get', '/test/override');
+				assert.equal(routeInfo.controller, 'CustomController');
+				assert.equal(routeInfo.action, 'override');
+				assert.equal(routeInfo.plugin, false);
+				assert.equal(routeInfo.prefix, false);
+			});
+		});
 	});
 });

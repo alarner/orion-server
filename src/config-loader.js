@@ -49,9 +49,17 @@ var configLoader = function(root, pluginInfo) {
 
 	config.prefix = pluginInfo.prefix;
 
-	_.forOwn(config.plugins, function(pluginInfo, pluginName) {
-		pluginInfo.name = pluginName;
-		var pluginConfig = configLoader(path.join(root, 'node_modules', pluginName), pluginInfo);
+	_.forOwn(config.plugins, function(subPluginInfo, pluginName) {
+		if(!subPluginInfo.hasOwnProperty('prefix')) {
+			subPluginInfo.prefix = {
+				route: '/'+(subPluginInfo.name || ''),
+				model: subPluginInfo.name || ''
+			};
+		}
+		subPluginInfo.name = pluginName;
+		subPluginInfo.prefix.model = config.prefix.model + subPluginInfo.prefix.model;
+		subPluginInfo.prefix.route = path.join(config.prefix.route, subPluginInfo.prefix.route);
+		var pluginConfig = configLoader(path.join(root, 'node_modules', pluginName), subPluginInfo);
 
 		if(pluginOverrides.hasOwnProperty(pluginName)) {
 			pluginConfig = _.extend(
