@@ -3,6 +3,7 @@ var sass = require('node-sass');
 var path = require('path');
 var fs = require('fs');
 var mkdirp = require('mkdirp');
+var winston = require('winston');
 
 module.exports = function(root, refreshFunction) {
 	var watcher = chokidar.watch(root, {
@@ -36,6 +37,7 @@ module.exports = function(root, refreshFunction) {
 			});
 		}
 		else {
+			winston.info('File changed', shortPath);
 			refreshFunction();
 		}
 	};

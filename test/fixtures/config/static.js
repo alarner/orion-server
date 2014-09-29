@@ -22,7 +22,7 @@ module.exports = {
 	// This can also be a string accepted by the ms module.
 	maxAge: 0,
 	// Redirect to trailing "/" when the pathname is a dir. Defaults to true.
-	redirect: true,
+	redirect: false,
 	// Function to set custom headers on response.
 	// Example:
 	// function setHeaders(res, path) {
