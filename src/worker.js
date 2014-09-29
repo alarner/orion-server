@@ -12,8 +12,8 @@ var Model = require('./model');
 module.exports = function(cluster, config) {
 
 	// Create the router
-	var router = new Router(config);
-	router.loadRoutes(config.router.routes);
+	var router = new Router();
+	router.loadRoutes(config);
 
 	this.start = function(cb) {
 		

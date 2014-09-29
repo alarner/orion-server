@@ -10,18 +10,17 @@ var RouterException = function(message) {
 	this.name = 'RouterException';
 };
 
-module.exports = function(config) {
+module.exports = function() {
 	var self = this;
 	this.routes = [];
 
 	this.route = function(method, url) {	
 		for(var i in self.routes) {
 			var route = self.routes[i];
-
 			if((route.info.method != '*') && (route.info.method != method.toLowerCase()))
 				continue;
 
-			if(url.length > 1) url = _s.rtrim(url, '/');
+			url = _s.rtrim(url, '/');
 			var match = self.routes[i].pattern.match(url);
 
 			if(!match)
@@ -37,7 +36,7 @@ module.exports = function(config) {
 							_s.capitalize
 						)
 						.join('')+'Controller'
-					: config.router.options.defaultController;
+					: info.config.router.options.defaultController;
 				delete match.controller;
 			}
 
@@ -49,7 +48,7 @@ module.exports = function(config) {
 							_s.capitalize
 						)
 						.join('')
-					: config.router.options.defaultAction;
+					: info.config.router.options.defaultAction;
 				info.action = info.action.charAt(0).toLowerCase() + info.action.slice(1);
 				// info.action = match.action || config.router.options.defaultAction;
 				delete match.action;
@@ -64,28 +63,33 @@ module.exports = function(config) {
 		return false;
 	};
 
-	this.loadRoutes = function() {
-		self.routes = [];
+	this.loadRoutes = function(parentConfig) {
+		if(!parentConfig.router) parentConfig.router = {};
+		if(!parentConfig.router.routes) parentConfig.router.routes = {};
 
 		// Add application routes
-		self.addRoutes(config.router.routes, self.routes, null, null, false);
+		self.addRoutes(parentConfig);
 
 		// Add plugin routes
-		_.forOwn(config.plugins, function(pluginConfig, name) {
-			if(!pluginConfig.router) pluginConfig.router = {};
-			if(!pluginConfig.router.routes) pluginConfig.router.routes = {};
+		_.forOwn(parentConfig.plugins, function(childConfig, name) {
+			self.loadRoutes(childConfig);
+			// if(!pluginConfig.router) pluginConfig.router = {};
+			// if(!pluginConfig.router.routes) pluginConfig.router.routes = {};
 
-			self.addRoutes(
-				pluginConfig.router.routes,
-				self.routes,
-				name,
-				pluginConfig.prefix.route,
-				true
-			);
+			// self.addRoutes(
+			// 	pluginConfig.router.routes,
+			// 	self.routes,
+			// 	name,
+			// 	pluginConfig.prefix.route,
+			// 	true
+			// );
 		});
 
-		// Add application catchall route
-		var route = '/(:controller)(/:action)(/:id)';
+		// Add parent catchall route
+		var route = '(/:controller)(/:action)(/:id)';
+		if(parentConfig.prefix.route && parentConfig.prefix.route != '/')
+			route = parentConfig.prefix.route+route;
+
 		self.routes.push({
 			pattern: urlPattern.newPattern(route),
 			info: {
@@ -93,16 +97,16 @@ module.exports = function(config) {
 				route: route,
 				controller: null,
 				action: null,
-				prefix: false,
-				plugin: false
+				config: parentConfig
 			}
 		});
 	};
 
-	this.addRoutes = function(routeObject, routes, plugin, prefix, catchall) {
-		if(catchall === undefined) catchall = true;
-		if(!prefix || !prefix.length) prefix = false;
-		if(!plugin || !plugin.length) plugin = false;
+	this.addRoutes = function(parentConfig) {
+		var prefix = parentConfig.prefix.route || false;
+		// var pluginPath = routeObject.prefix.route || false;
+		// if(!prefix || !prefix.length) prefix = false;
+		// if(!plugin || !plugin.length) plugin = false;
 
 		// Normalize the prefix to start with a forward slash and *not* end with a forward slash.
 		if(prefix)
@@ -111,20 +115,17 @@ module.exports = function(config) {
 			prefix.substring(0, prefix.length-1);
 		
 		// Parse the app routes list
-		_.forOwn(routeObject, function(val, key) {
+		_.forOwn(parentConfig.router.routes, function(val, key) {
 			var pieces = val.split('.');
 			if(pieces.length != 2)
 				throw new RouterException('Invalid route target: "'+val+'". It must be in the format [Controller].[action]');
 
 			key = key.trim();
-			if(prefix) key = path.join(prefix, key);
 			var parsed = {
 				method: '*',
-				route: key,
 				controller: pieces[0],
 				action: pieces[1],
-				prefix: prefix,
-				plugin: plugin
+				config: parentConfig
 			};
 			var matched = key.match(/^(get|put|post|delete)\s+(.+)$/);
 			if(matched) {
@@ -133,6 +134,10 @@ module.exports = function(config) {
 				parsed.method = matched[1].toLowerCase();
 				parsed.route = route;
 			}
+			else {
+				if(prefix) key = path.join(prefix, key);
+				parsed.route = key;
+			}
 
 			self.routes.push({
 				pattern: urlPattern.newPattern(parsed.route),
@@ -140,22 +145,22 @@ module.exports = function(config) {
 			});
 		});
 
-		if(catchall) {
-			var route = '(/:controller)(/:action)(/:id)';
-			if(prefix)
-				route = prefix+route;
+		// if(catchall) {
+		// 	var route = '(/:controller)(/:action)(/:id)';
+		// 	if(prefix)
+		// 		route = prefix+route;
 
-			self.routes.push({
-				pattern: urlPattern.newPattern(route),
-				info: {
-					method: '*',
-					route: route,
-					controller: null,
-					action: null,
-					prefix: prefix,
-					plugin: plugin
-				}
-			});
-		}
+		// 	self.routes.push({
+		// 		pattern: urlPattern.newPattern(route),
+		// 		info: {
+		// 			method: '*',
+		// 			route: route,
+		// 			controller: null,
+		// 			action: null,
+		// 			prefix: prefix,
+		// 			plugin: plugin
+		// 		}
+		// 	});
+		// }
 	};
 };

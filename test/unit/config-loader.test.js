@@ -72,7 +72,7 @@ describe('config-loader', function() {
 			var subpluginConfig = config.plugins['orion-test-plugin'].plugins['orion-test-subplugin'];
 			assert.equal(
 				subpluginConfig.router.options.defaultAction,
-				'subplugin'
+				'myOverride'
 			);
 			assert.equal(
 				subpluginConfig.root,

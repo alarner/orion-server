@@ -14,13 +14,13 @@ describe('router', function() {
 			assert.isDefined(this.config.plugins['orion-test-plugin'].prefix);
 			assert.isDefined(this.config.plugins['orion-test-plugin'].express);
 		});
-	})
+	});
 
 	describe('when we call router.route()', function() {
 		describe('with a url that doesn\'t match a custom route', function() {
 			it('should default to the fallback route', function() {
-				var router = new Router(this.config);
-				router.loadRoutes(this.config.router.routes);
+				var router = new Router();
+				router.loadRoutes(this.config);
 
 				var routeInfo = router.route('get', '/what/myaction');
 				assert.equal(routeInfo.controller, 'WhatController');
@@ -41,8 +41,8 @@ describe('router', function() {
 
 			describe('with dashes in it', function() {
 				it('should default to the fallback route and convert the dashes', function() {
-					var router = new Router(this.config);
-					router.loadRoutes(this.config.router.routes);
+					var router = new Router();
+					router.loadRoutes(this.config);
 
 					var routeInfo = router.route('get', '/hello-earth');
 					assert.equal(routeInfo.controller, 'HelloEarthController');
@@ -56,8 +56,8 @@ describe('router', function() {
 		});
 		describe('with a url that matches a custom route', function() {
 			it('should return that custom route', function() {
-				var router = new Router(this.config);
-				router.loadRoutes(this.config.router.routes);
+				var router = new Router();
+				router.loadRoutes(this.config);
 
 				var routeInfo = router.route('get', '/fancy');
 				assert.equal(routeInfo.controller, 'CustomController');
@@ -96,9 +96,9 @@ describe('router', function() {
 		});
 		describe('with the root url (/)', function() {
 			it('should use the defaults specified in the config', function() {
-				var router = new Router(this.config);
-				router.loadRoutes(this.config.router.routes);
-				
+				var router = new Router();
+				router.loadRoutes(this.config);
+
 				var routeInfo = router.route('get', '/');
 				assert.equal(routeInfo.controller, this.config.router.options.defaultController);
 				assert.equal(routeInfo.action, this.config.router.options.defaultAction);
@@ -106,51 +106,35 @@ describe('router', function() {
 		});
 		describe('with a url that matches a plugin route', function() {
 			it('should return that plugin route', function() {
-				var router = new Router(this.config);
-				router.loadRoutes(this.config.router.routes);
+				var router = new Router();
+				router.loadRoutes(this.config);
 
 				var routeInfo = router.route('get', '/test');
 				assert.equal(routeInfo.controller, 'IndexController');
 				assert.equal(routeInfo.action, 'index');
-				assert.equal(routeInfo.plugin, 'orion-test-plugin');
-				assert.equal(routeInfo.prefix, '/test');
+				assert.deepEqual(routeInfo.config, this.config.plugins['orion-test-plugin']);
 
 				var routeInfo = router.route('get', '/test/face/book');
 				assert.equal(routeInfo.controller, 'FaceController');
 				assert.equal(routeInfo.action, 'book');
-				assert.equal(routeInfo.plugin, 'orion-test-plugin');
-				assert.equal(routeInfo.prefix, '/test');
+				assert.deepEqual(routeInfo.config, this.config.plugins['orion-test-plugin']);
 
 				var routeInfo = router.route('get', '/test/override');
 				assert.equal(routeInfo.controller, 'CustomController');
 				assert.equal(routeInfo.action, 'override');
-				assert.equal(routeInfo.plugin, false);
-				assert.equal(routeInfo.prefix, false);
+				assert.equal(routeInfo.config.prefix.route, this.config.prefix.route);
 			});
 		});
 
 		describe('with a url that matches a sub-plugin route', function() {
 			it('should return that sub-plugin route', function() {
-				var router = new Router(this.config);
-				router.loadRoutes(this.config.router.routes);
+				var router = new Router();
+				router.loadRoutes(this.config);
 
-				var routeInfo = router.route('get', '/test');
-				assert.equal(routeInfo.controller, 'IndexController');
-				assert.equal(routeInfo.action, 'index');
-				assert.equal(routeInfo.plugin, 'orion-test-plugin');
-				assert.equal(routeInfo.prefix, '/test');
-
-				var routeInfo = router.route('get', '/test/face/book');
-				assert.equal(routeInfo.controller, 'FaceController');
-				assert.equal(routeInfo.action, 'book');
-				assert.equal(routeInfo.plugin, 'orion-test-plugin');
-				assert.equal(routeInfo.prefix, '/test');
-
-				var routeInfo = router.route('get', '/test/override');
-				assert.equal(routeInfo.controller, 'CustomController');
-				assert.equal(routeInfo.action, 'override');
-				assert.equal(routeInfo.plugin, false);
-				assert.equal(routeInfo.prefix, false);
+				var routeInfo = router.route('get', '/test/sub');
+				assert.equal(routeInfo.controller, 'OverrideController');
+				assert.equal(routeInfo.action, 'myOverride');
+				assert.deepEqual(routeInfo.config, this.config.plugins['orion-test-plugin'].plugins['orion-test-subplugin']);
 			});
 		});
 	});
