@@ -5,11 +5,13 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var winston = require('winston');
 
-module.exports = function(root, refreshFunction) {
-	var watcher = chokidar.watch(root, {
+module.exports = function(config, refreshFunction) {
+	var options = {
 		ignoreInitial: true,
 		usePolling: false
-	});
+	};
+	options = _.extend(options, config.watcher);
+	var watcher = chokidar.watch(config.root, options);
 
 	var change = function(file) {
 		var shortPath = file.substring(root.length);
