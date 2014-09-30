@@ -57,16 +57,30 @@ describe('controller', function() {
 				this.controller.policySettings.IndexController.pluginPolicy,
 				['greeting', 'index', 'orion-test-plugin::auth']
 			);
+
+			assert.isUndefined(this.controller.policySettings['orion-test-plugin::HelloController']);
 		});
 
 		it('should load all of the plugin controllers', function() {
 			assert.isDefined(this.controller.cachedControllers['orion-test-plugin::IndexController']);
+			assert.isUndefined(this.controller.cachedControllers['orion-test-plugin::HelloController']);
 		});
 
 		it('should load all of the policies for each plugin controller', function() {
 			assert.deepEqual(
 				this.controller.policySettings['orion-test-plugin::IndexController'].face,
 				['orion-test-plugin::auth']
+			);
+		});
+
+		it('should load all of the subplugin controllers', function() {
+			assert.isDefined(this.controller.cachedControllers['orion-test-plugin::orion-test-subplugin::SubpluginController']);
+		});
+
+		it('should load all of the policies for each subplugin controller', function() {
+			assert.deepEqual(
+				this.controller.policySettings['orion-test-plugin::orion-test-subplugin::SubpluginController'].sub,
+				[]
 			);
 		});
 	});

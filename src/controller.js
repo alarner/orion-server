@@ -149,17 +149,18 @@ module.exports = function(config) {
 
 		// Apply the default controller policies to all controllers that are not in config.policies.
 		_.forOwn(self.cachedControllers, function(controller, controllerName) {
-			if(pluginConfigPolicies.hasOwnProperty(controllerName)) return;
+			var prefix = pluginPath.join('::')+'::';
 
-			// Normalize the controllerName
-			var normControllerName = controllerName;
-			if(pluginPath.length)
-				normControllerName = pluginPath.join('::')+'::'+controllerName;
+			if(pluginPath.length && controllerName.substring(0, prefix.length) != prefix)
+				return;
 
-			self.policySettings[normControllerName] = {};
+			if(pluginConfigPolicies.hasOwnProperty(controllerName))
+				return;
 
-			_.forOwn(self.cachedControllers[normControllerName], function(action, actionName) {
-				self.policySettings[normControllerName][actionName] = prefixPolicies(
+			self.policySettings[controllerName] = {};
+
+			_.forOwn(self.cachedControllers[controllerName], function(action, actionName) {
+				self.policySettings[controllerName][actionName] = prefixPolicies(
 					_.union(
 						forcedControllerPolicies,
 						defaultControllerPolicies
