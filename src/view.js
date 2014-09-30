@@ -67,6 +67,27 @@ var View = {
 
 				fs.readFile(viewPath, function(err, viewData) {
 					if(err) return cb(err);
+
+					// Register link helper
+					Handlebars.registerHelper('url', function(data, raw) {
+						if(arguments.length < 3) raw = false;
+
+						// The passed in data resembles a url. Add the
+						// appropriate prefix if necessary.
+						if(raw) {
+							if(data.charAt(0) == '/') {
+								return path.join(config.prefix.route, data);
+							}
+							else {
+								return data;
+							}
+						}
+
+						// The passed in data is in the format of:
+						// plugin::subplugin::FooController.bar
+						
+						return destination+(raw ? 'raw' : 'action');
+					});
 					
 					var compiled = Handlebars.compile(viewData.toString());
 					if(!compiled) return cb('Unable to compile view.');
