@@ -8,6 +8,9 @@ module.exports = {
 	pluginPolicy: function(req, res, models, config) {
 		
 	},
+	paramCaseTest: function(req, res, models, config) {
+		res.view();
+	},
 	viewTest: function(req, res, models, config) {
 		res.view();
 	}

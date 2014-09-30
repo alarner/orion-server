@@ -2,6 +2,7 @@ var sinon 	= require('sinon');
 var assert 	= require('chai').assert;
 var path	= require('path');
 var fs		= require('fs');
+var _		= require('lodash');
 var View 	= require('../../src/view');
 var Request = require('../../src/request');
 var Response = require('../../src/response');
@@ -36,6 +37,22 @@ describe('view', function() {
 	});
 
 	describe('when we call view.render()', function() {
+		describe('on an action with a camelCase name', function() {
+			it('should show the appropriate view with the param-case name', function(done) {
+				var self = this;
+				var req = _.extend({}, this.req);
+				req.info.action = 'paramCaseTest';
+				this.res.send = sinon.spy();
+				View.render(this.req, this.res, this.config, undefined, undefined, function() {
+					assert(
+						self.res.send.calledWith(
+							fs.readFileSync(path.join(__dirname, '../fixtures/views/index/param-case-test.hbs')).toString()
+						)
+					);
+					done();
+				});
+			});
+		});
 		describe('with no path or params', function() {
 			describe('and the request is good', function() {
 				it('should show the default view', function(done) {
