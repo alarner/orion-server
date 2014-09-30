@@ -110,7 +110,6 @@ module.exports = function(config) {
 			var forcedActionPolicies = actions['*!'] || [];
 
 			self.policySettings[normControllerName] = {};
-
 			_.forOwn(actions, function(policies, actionName) {
 				// Ignore special keys
 				if(actionName == '*') return;
@@ -149,12 +148,14 @@ module.exports = function(config) {
 
 		// Apply the default controller policies to all controllers that are not in config.policies.
 		_.forOwn(self.cachedControllers, function(controller, controllerName) {
-			var prefix = pluginPath.join('::')+'::';
+			var prefix = '';
+			if(pluginPath.length)
+				prefix = pluginPath.join('::')+'::';
 
 			if(pluginPath.length && controllerName.substring(0, prefix.length) != prefix)
 				return;
 
-			if(pluginConfigPolicies.hasOwnProperty(controllerName))
+			if(pluginConfigPolicies.hasOwnProperty(controllerName.substring(prefix.length)))
 				return;
 
 			self.policySettings[controllerName] = {};

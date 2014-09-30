@@ -71,6 +71,14 @@ describe('controller', function() {
 				this.controller.policySettings['orion-test-plugin::IndexController'].face,
 				['orion-test-plugin::auth']
 			);
+			assert.deepEqual(
+				this.controller.policySettings['orion-test-plugin::PolicyController'].index,
+				['orion-test-plugin::policy2', 'orion-test-plugin::test-plugin']
+			);
+			assert.deepEqual(
+				this.controller.policySettings['orion-test-plugin::PolicyController'].giveDefaults,
+				['orion-test-plugin::auth', 'orion-test-plugin::policy2', 'orion-test-plugin::policy1']
+			);
 		});
 
 		it('should load all of the subplugin controllers', function() {
