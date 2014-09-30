@@ -4,6 +4,7 @@ var path = require('path');
 var fs = require('fs');
 var async = require('async');
 var recursive = require('recursive-readdir');
+var changeCase = require('change-case');
 
 require('handlebars-layouts')(Handlebars);
 
@@ -27,10 +28,6 @@ var View = {
 				},
 				cb
 			);
-			
-			// // Files is an array of filename
-			// console.log(files);
-			// cb();
 		});
 	},
 	render: function(req, res, config, viewPath, params, cb) {
@@ -54,7 +51,7 @@ var View = {
 				config.root,
 				'views',
 				controllerName,
-				req.info.action.toLowerCase()+'.hbs'
+				changeCase.paramCase(req.info.action)+'.hbs'
 			);
 		}
 		// Use the path that was passed in. Make it relative to root/views 
