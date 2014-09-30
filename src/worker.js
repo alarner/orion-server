@@ -18,8 +18,8 @@ module.exports = function(cluster, config) {
 	this.start = function(cb) {
 		
 		var controller = new Controller(config);
-		controller.loadControllers(path.join(config.root, '/app/controllers'));
-		controller.loadPolicies(path.join(config.root, '/app/policies'));
+		controller.loadControllers(config);
+		controller.loadPolicies(config);
 
 		var model = new Model(config);
 
