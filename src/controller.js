@@ -5,12 +5,16 @@ var winston = require('winston');
 var path = require('path');
 var serveStatic = require('serve-static');
 var skipper = require('skipper')();
+var session = require('express-session');
 
 module.exports = function(config) {
 	var self = this;
 	var staticMiddleware = serveStatic(
 		path.join(config.root, 'public'), 
 		config['static']
+	);
+	var sessionMiddleware = session(
+		config.session || {}
 	);
 
 	this.cachedControllers = {};
@@ -26,7 +30,11 @@ module.exports = function(config) {
 			});
 			res.end(body);
 		};
-		skipper(req, res, cb);
+		async.series([
+			function(cb) { skipper(req, res, cb); },
+			function(cb) { sessionMiddleware(req, res, cb); }
+		], cb)
+		
 	};
 	
 	this.run = function(req, res, info, models) {
