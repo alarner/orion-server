@@ -21,6 +21,7 @@
     "recursive-readdir": "^1.2.0",
     "sails-disk": "^0.10.3",
     "serve-static": "^1.6.3",
+    "skipper": "^0.5.3",
     "underscore-deep-extend": "0.0.5",
     "underscore.string": "^2.3.3",
     "url-pattern": "^0.6.0",

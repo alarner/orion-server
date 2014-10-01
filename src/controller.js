@@ -4,6 +4,7 @@ var _ = require('lodash');
 var winston = require('winston');
 var path = require('path');
 var serveStatic = require('serve-static');
+var skipper = require('skipper')();
 
 module.exports = function(config) {
 	var self = this;
@@ -25,7 +26,7 @@ module.exports = function(config) {
 			});
 			res.end(body);
 		};
-		cb();
+		skipper(req, res, cb);
 	};
 	
 	this.run = function(req, res, info, models) {
