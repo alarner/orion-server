@@ -6,6 +6,7 @@ var path = require('path');
 var serveStatic = require('serve-static');
 var skipper = require('skipper')();
 var session = require('express-session');
+var flash = require('connect-flash');
 
 module.exports = function(config) {
 	var self = this;
@@ -16,6 +17,7 @@ module.exports = function(config) {
 	var sessionMiddleware = session(
 		config.session || {}
 	);
+	var flashMiddleware = flash();
 
 	this.cachedControllers = {};
 	this.cachedPolicies = {};
@@ -32,7 +34,8 @@ module.exports = function(config) {
 		};
 		async.series([
 			function(cb) { skipper(req, res, cb); },
-			function(cb) { sessionMiddleware(req, res, cb); }
+			function(cb) { sessionMiddleware(req, res, cb); },
+			function(cb) { flashMiddleware(req, res, cb); }
 		], cb)
 		
 	};
