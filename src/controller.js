@@ -6,7 +6,6 @@ var path = require('path');
 var serveStatic = require('serve-static');
 var skipper = require('skipper')();
 var session = require('express-session');
-var flash = require('connect-flash');
 
 module.exports = function(config) {
 	var self = this;
@@ -17,31 +16,71 @@ module.exports = function(config) {
 	var sessionMiddleware = session(
 		config.session || {}
 	);
-	var flashMiddleware = flash();
 
 	this.cachedControllers = {};
 	this.cachedPolicies = {};
 	this.policySettings = {};
 
 	this.prepare = function(req, res, cb) {
-		res.notFound = function(body) {
-			if(body == undefined) body = 'Page Not Found';
-			res.writeHead(404, {
-				'Content-Length': body.length,
-				'Content-Type': 'text/plain'
-			});
-			res.end(body);
-		};
-		res.redir = function(dest, status) {
-			if(dest.charAt(0) == '/') {
-				dest = path.join(config.prefix.route, dest);
-			}
-			return res.redirect(status, dest);
-		};
 		async.series([
 			function(cb) { skipper(req, res, cb); },
 			function(cb) { sessionMiddleware(req, res, cb); },
-			function(cb) { flashMiddleware(req, res, cb); }
+			function(cb) {
+				if(!req.session.hasOwnProperty('orion'))
+					req.session.orion = {};
+
+				req.session.orion.lastData = req.session.orion.currentData || {};
+				req.session.orion.currentData = {
+					body: req.body || {},
+					params: req.params || {},
+					query: req.query || {}
+				};
+
+				res.notFound = function(body) {
+					if(body == undefined) body = 'Page Not Found';
+					res.writeHead(404, {
+						'Content-Length': body.length,
+						'Content-Type': 'text/plain'
+					});
+					res.end(body);
+				};
+				res.redir = function(dest, status) {
+					status = status || 303;
+					if(dest.charAt(0) == '/') {
+						dest = path.join(config.prefix.route, dest);
+					}
+					return res.redirect(status, dest);
+				};
+				res.error = function(err) {
+					if(!req.session.orion.hasOwnProperty('error'))
+						req.session.orion.error = {};
+
+					req.session.orion.error = err;
+				};
+				req.error = function() {
+					var message = '';
+					if(req.session.hasOwnProperty('orion')) {
+						if(req.session.orion.hasOwnProperty('error')) {
+							if(req.session.orion.error.hasOwnProperty('message')) {
+								message = req.session.orion.error.message;
+							}
+							delete req.session.orion.error;
+						}
+					}
+					return message;
+				};
+				req.last = function(type, key) {
+					if(req.session.orion.lastData) {
+						if(req.session.orion.lastData.hasOwnProperty(type)) {
+							if(req.session.orion.lastData[type].hasOwnProperty(key)) {
+								return req.session.orion.lastData[type][key];
+							}
+						}
+					}
+					return '';
+				};
+				cb();
+			}
 		], cb)
 		
 	};
