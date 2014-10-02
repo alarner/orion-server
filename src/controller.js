@@ -36,7 +36,7 @@ module.exports = function(config) {
 			if(dest.charAt(0) == '/') {
 				dest = path.join(config.prefix.route, dest);
 			}
-			return res.redirect(dest, status);
+			return res.redirect(status, dest);
 		};
 		async.series([
 			function(cb) { skipper(req, res, cb); },
