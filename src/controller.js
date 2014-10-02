@@ -33,7 +33,7 @@ module.exports = function(config) {
 			res.end(body);
 		};
 		res.redir = function(dest, status) {
-			if(dest.chatAt(0) == '/') {
+			if(dest.charAt(0) == '/') {
 				dest = path.join(config.prefix.route, dest);
 			}
 			return res.redirect(dest, status);
