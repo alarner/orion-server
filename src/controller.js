@@ -32,6 +32,12 @@ module.exports = function(config) {
 			});
 			res.end(body);
 		};
+		res.redir = function(dest, status) {
+			if(dest.chatAt(0) == '/') {
+				dest = path.join(config.prefix.route, dest);
+			}
+			return res.redirect(dest, status);
+		};
 		async.series([
 			function(cb) { skipper(req, res, cb); },
 			function(cb) { sessionMiddleware(req, res, cb); },
