@@ -4,7 +4,7 @@ var includeAll = require('include-all');
 var _ = require('lodash');
 var argv = require('optimist').argv;
 
-var configLoader = function(root, pluginInfo) {
+var configLoader = function(root, globalRoot, pluginInfo) {
 	var self = this;
 
 	// Load app configuration files
@@ -32,6 +32,7 @@ var configLoader = function(root, pluginInfo) {
 	}
 
 	config.root = root;
+	config.globalRoot = globalRoot;
 	config.express = {app: express()};
 	config.argv = argv || {};
 	config.plugins = config.plugins || {};
@@ -59,7 +60,7 @@ var configLoader = function(root, pluginInfo) {
 		subPluginInfo.name = pluginName;
 		subPluginInfo.prefix.model = config.prefix.model + subPluginInfo.prefix.model;
 		subPluginInfo.prefix.route = path.join(config.prefix.route, subPluginInfo.prefix.route);
-		var pluginConfig = configLoader(path.join(root, 'node_modules', pluginName), subPluginInfo);
+		var pluginConfig = configLoader(path.join(root, 'node_modules', pluginName), globalRoot, subPluginInfo);
 
 		if(pluginOverrides.hasOwnProperty(pluginName)) {
 			pluginConfig = _.extend(

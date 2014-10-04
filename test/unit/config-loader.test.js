@@ -7,7 +7,8 @@ var configLoader 	= require('../../src/config-loader');
 describe('config-loader', function() {
 
 	describe('when we call config-loader', function() {
-		var config = configLoader(path.join(__dirname, '../fixtures'))
+		var root = path.join(__dirname, '../fixtures');
+		var config = configLoader(root, root)
 		it('should set the root', function() {
 			assert.equal(config.root, path.join(__dirname, '../fixtures'));
 		});
@@ -95,6 +96,12 @@ describe('config-loader', function() {
 
 		it('should set the default plugin model prefix to an empty string', function() {
 			assert.equal(config.prefix.model, '');
+		});
+
+		it('should set the global root', function() {
+			assert.equal(config.globalRoot, config.root);
+			assert.equal(config.plugins['orion-test-plugin'].globalRoot, config.root);
+			assert.equal(config.plugins['orion-test-plugin'].plugins['orion-test-subplugin'].globalRoot, config.root);
 		});
 	});
 });
