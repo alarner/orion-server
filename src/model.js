@@ -89,14 +89,20 @@ module.exports = function(config) {
 				model.attributes = {};
 
 			_.forOwn(model.attributes, function(attribute, attributeName) {
-				if(!attribute.hasOwnProperty('collection')) return;
+				if(!attribute.hasOwnProperty('collection') && !attribute.hasOwnProperty('model')) return;
 
-				if(!keyedModels.hasOwnProperty(attribute.collection)) {
+				var target = attribute.collection || attribute.model;
+
+				if(!keyedModels.hasOwnProperty(target)) {
 					err = 'Could not find associated model "'+attribute.collection+'" in "'+model.__orion.originalName+'"';
 					return;
 				}
 
-				attribute.collection = keyedModels[attribute.collection].identity;
+				if(attribute.hasOwnProperty('collection'))
+					attribute.collection = keyedModels[target].identity;
+
+				if(attribute.hasOwnProperty('model'))
+					attribute.model = keyedModels[target].identity;
 			});
 
 			var extendedModel = Waterline.Collection.extend(model);

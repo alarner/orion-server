@@ -1,5 +1,5 @@
 module.exports = {
 	attributes: {
-		userId: { type: 'integer' }
+		userId: { model: 'UserTest' }
 	}
 };

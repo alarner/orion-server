@@ -24,7 +24,7 @@ describe('model', function() {
 			var self = this;
 			this.model.loadDatabase(function(err, models) {
 				assert.isNull(err);
-				assert.isDefined(models.User);
+				assert.isDefined(models.UserTest);
 				done();
 			});
 		});
@@ -66,11 +66,12 @@ describe('model', function() {
 			});
 		});
 
-		// it('should correctly replace association names', function(done) {
-		// 	this.model.loadDatabase(function(err, models) {
-		// 		assert.equal(models.user._attributes.authOptions.collection, 'user_auth_option');
-		// 		done();
-		// 	});
-		// });
+		it('should correctly replace association names', function(done) {
+			this.model.loadDatabase(function(err, models) {
+				assert.equal(models.UserTest._attributes.authOptions.collection, 'user_auth_option');
+				assert.equal(models.UserAuthOption._attributes.userId.model, 'user_test');
+				done();
+			});
+		});
 	});
 });
