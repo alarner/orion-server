@@ -1,19 +1,22 @@
+var Sequelize = require('sequelize');
 module.exports = {
 	key: 'value',
 	models: {
 		Test: {
 			attributes: {
 				replace: {
-					type: 'bool',
-					required: true
+					type: Sequelize.BOOLEAN,
+					allowNull: false
 				},
 				add: {
-					type: 'string',
-					required: true
+					type: Sequelize.STRING,
+					allowNull: false
 				}
 			},
-			getById: function(id, cb) {
-				cb(123);
+			options: {
+				classMethods: {
+					getById: function() { return 'smth' }
+				}
 			}
 		}
 	}

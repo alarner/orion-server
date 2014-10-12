@@ -11,5 +11,12 @@ module.exports = {
 			as: 'UserAuthOptions'
 		}
 	},
-	options: {}
+	options: {
+		classMethods: {
+			method1: function() { return 'smth' }
+		},
+		instanceMethods: {
+			method2: function() { return 'foo' }
+		}
+	}
 };

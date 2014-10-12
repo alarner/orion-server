@@ -1,6 +1,7 @@
 var sinon 	= require('sinon');
-var assert 	= require('chai').assert;
+var Sequelize = require('sequelize');
 var path	= require('path');
+var assert 	= require('chai').assert;
 var Model 	= require('../../src/model');
 
 
@@ -20,9 +21,6 @@ describe('model', function() {
 		it('should run without errors', function() {
 			this.model.load();
 		});
-		// it('should call the callback', function(done) {
-		// 	this.model.loadDatabase(done);
-		// });
 
 		it('should load the app models', function() {
 			this.model.load();
@@ -31,6 +29,7 @@ describe('model', function() {
 			assert.isDefined(this.model.models.UserAuthOption);
 			assert.isDefined(this.model.pluginModels['orion-test-plugin'].models.Test);
 			assert.isDefined(this.model.pluginModels['orion-test-plugin'].models.TestTest);
+			assert.isFunction(this.model.models.UserTest.method1);
 		});
 
 		it('should set all of the undefined table names to snake_case', function() {
@@ -48,27 +47,15 @@ describe('model', function() {
 			);
 		});
 
-		// it('should apply model overrides to plugin models', function(done) {
-		// 	var self = this;
-		// 	this.model.loadDatabase(function(err, models) {
-		// 		assert.isNull(err);
-		// 		assert.isDefined(models['orion-test-plugin::Test']);
-		// 		assert.isFunction(models['orion-test-plugin::Test'].getById);
-		// 		assert.isDefined(models['orion-test-plugin::Test'].attributes.add);
-		// 		assert.isDefined(models['orion-test-plugin::Test'].attributes.replace);
-		// 		assert.equal(models['orion-test-plugin::Test'].attributes.replace.type, 'bool');
-		// 		assert.equal(models['orion-test-plugin::Test'].attributes.name.type, 'string');
-		// 		done();
-		// 	});
-		// });
-
-		// it('should correctly replace association names', function(done) {
-		// 	this.model.loadDatabase(function(err, models) {
-		// 		assert.equal(models.UserTest._attributes.authOptions.collection, 'user_auth_option');
-		// 		assert.equal(models.UserAuthOption._attributes.userId.model, 'user_test');
-		// 		done();
-		// 	});
-		// });
+		it('should apply model overrides to plugin models', function() {
+			this.model.load();
+			assert.isDefined(this.model.pluginModels['orion-test-plugin'].models.Test);
+			assert.isFunction(this.model.pluginModels['orion-test-plugin'].models.Test.getById);
+			assert.isDefined(this.model.pluginModels['orion-test-plugin'].models.Test.attributes.add);
+			assert.isDefined(this.model.pluginModels['orion-test-plugin'].models.Test.attributes.replace);
+			assert.equal(this.model.pluginModels['orion-test-plugin'].models.Test.attributes.replace.type, Sequelize.BOOLEAN);
+			assert.equal(this.model.pluginModels['orion-test-plugin'].models.Test.attributes.name.type, Sequelize.STRING);
+		});
 	});
 
 	describe('when we call model.get(...)', function() {
