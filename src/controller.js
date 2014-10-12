@@ -85,7 +85,8 @@ module.exports = function(config) {
 		
 	};
 	
-	this.run = function(req, res, info, models) {
+	// @todo pass the appropriate config and models (not always the root one)
+	this.run = function(req, res, info, model) {
 		async.series([
 			function(cb) {
 				if(!config.argv || !config.argv.hasOwnProperty('static') || !config.argv['static'])
@@ -104,10 +105,10 @@ module.exports = function(config) {
 				async.eachSeries(
 					self.policySettings[info.controller][info.action],
 					function(policyName, cb) {
-						return self.cachedPolicies[policyName](req, res, models, config, cb);
+						return self.cachedPolicies[policyName](req, res, model, config, cb);
 					},
 					function(err) {
-						self.cachedControllers[info.controller][info.action](req, res, models, config);
+						self.cachedControllers[info.controller][info.action](req, res, model, config);
 					}
 				);
 			});

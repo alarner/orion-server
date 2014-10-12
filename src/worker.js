@@ -22,11 +22,12 @@ module.exports = function(cluster, config) {
 		controller.loadPolicies(config);
 
 		var model = new Model(config);
+		model.load(config);
 
 		async.parallel({
-			models: function(cb) {
-				model.loadDatabase(cb);
-			},
+			// models: function(cb) {
+			// 	model.loadDatabase(cb);
+			// },
 			layouts: function(cb) {
 				View.loadLayouts(
 					path.join(config.root, '/layouts'),
@@ -38,7 +39,7 @@ module.exports = function(cluster, config) {
 				Request(req, res, config);
 				Response(req, res, config);
 				var routeInfo = router.route(req.method, req.url);
-				controller.run(req, res, routeInfo, results.models);
+				controller.run(req, res, routeInfo, model);
 			}).listen(config.webserver.port);
 			cluster.worker.send('orion::ready');
 		});

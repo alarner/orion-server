@@ -21,8 +21,8 @@ describe('config-loader', function() {
 		});
 		it('should load the appropriate config values', function() {
 			assert.equal(
-				config.database.connections.main.adapter,
-				'sails-disk'
+				config.database.dialect,
+				'sqlite'
 			);
 			assert(
 				config.logger.Console.timestamp
