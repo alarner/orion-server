@@ -56,6 +56,12 @@ describe('model', function() {
 			assert.equal(this.model.pluginModels['orion-test-plugin'].models.Test.attributes.replace.type, Sequelize.BOOLEAN);
 			assert.equal(this.model.pluginModels['orion-test-plugin'].models.Test.attributes.name.type, Sequelize.STRING);
 		});
+
+		it('should provide access to models from each model', function() {
+			this.model.load();
+			assert.equal(this.model.get('UserTest').models, this.model);
+			assert.equal(this.model.get('orion-test-plugin::TestTest').models, this.model.getPluginModels(['orion-test-plugin']));
+		});
 	});
 
 	describe('when we call model.get(...)', function() {

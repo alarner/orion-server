@@ -39,12 +39,12 @@ var Model = function(config, sequelize) {
 	this.get = function(modelName) {
 		var pieces = modelName.split('::');
 		var model = pieces.pop();
-		var plugin = this.getPlugin(pieces);
+		var plugin = this.getPluginModels(pieces);
 		if(!plugin.models.hasOwnProperty(model)) return false;
 		return plugin.models[model];
 	};
 
-	this.getPlugin = function(pluginPath) {
+	this.getPluginModels = function(pluginPath) {
 		var target = this;
 		for(var i=0; i<pluginPath.length; i++) {
 			var pluginName = pluginPath[i];
@@ -85,7 +85,11 @@ var Model = function(config, sequelize) {
 				};
 			}
 
-			var options = _.extend({}, model.options);
+			var options = _.deepExtend({
+				classMethods: {
+					models: self
+				}
+			}, model.options);
 			if(!options.tableName) {
 				options.tableName = config.prefix.model+changeCase.snakeCase(modelName);
 			}
