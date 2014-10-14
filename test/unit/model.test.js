@@ -12,11 +12,6 @@ describe('model', function() {
 		this.model = new Model(this.config);
 	});
 
-	afterEach(function(done) {
-		// this.model.waterline.teardown(done);
-		done();
-	});
-
 	describe('when we call model.load()', function() {
 		it('should run without errors', function() {
 			this.model.load();
@@ -61,6 +56,11 @@ describe('model', function() {
 			this.model.load();
 			assert.equal(this.model.get('UserTest').models, this.model);
 			assert.equal(this.model.get('orion-test-plugin::TestTest').models, this.model.getPluginModels(['orion-test-plugin']));
+		});
+
+		it('should not set association properties on the model', function() {
+			this.model.load();
+			assert.isUndefined(this.model.get('UserTest').tableAttributes.authOptions);
 		});
 	});
 

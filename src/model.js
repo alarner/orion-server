@@ -95,18 +95,24 @@ var Model = function(config, sequelize) {
 			}
 
 			// Remove associations for now
+			var associationAttributes = [];
 			for(var name in attributes) {
 				if(!attributes.hasOwnProperty(name)) return;
 				var attribute = attributes[name];
 				if(!attribute.type)
 					throw new ModelException('Attribute "'+name+'" on model "'+modelName+'" does not have a type.');
-				if(_.isString(attribute.type) && attribute.type.toLowerCase() == 'assocation');
-				delete attributes[name];
+				if(_.isString(attribute.type) && attribute.type.toLowerCase() == 'association') {
+					associationAttributes.push(name);
+				}
 			}
+
+			associationAttributes.forEach(function(name) {
+				delete attributes[name];
+			});
 
 			self.models[modelName] = sequelize.define(
 				modelName,
-				model.attributes,
+				attributes,
 				options
 			);
 		});
