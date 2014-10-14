@@ -15,13 +15,12 @@ module.exports = function(config, refreshFunction) {
 	var watcher = chokidar.watch(config.root, options);
 
 	var change = function(file) {
-		var shortPath = file.substring(root.length);
-
+		var shortPath = file.substring(config.root.length);
 		if(shortPath.substring(0, 8) == '/public/') return;
 
 		var ext = path.extname(shortPath);
 		if((shortPath.substring(0, 6) == '/sass/' || shortPath.substring(0, 6) == '/scss/') && (ext == '.scss' || ext == '.sass')) {
-			var outFile = path.join(root, 'public', 'css', shortPath.substring(6, shortPath.length-5)+'.css');
+			var outFile = path.join(config.root, 'public', 'css', shortPath.substring(6, shortPath.length-5)+'.css');
 			sass.render({
 				file: file,
 				success: function(css) {
