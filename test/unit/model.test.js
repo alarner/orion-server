@@ -54,8 +54,8 @@ describe('model', function() {
 
 		it('should provide access to models from each model', function() {
 			this.model.load();
-			assert.equal(this.model.get('UserTest').models, this.model);
-			assert.equal(this.model.get('orion-test-plugin::TestTest').models, this.model.getPluginModels(['orion-test-plugin']));
+			assert.equal(this.model.get('UserTest').model, this.model);
+			assert.equal(this.model.get('orion-test-plugin::TestTest').model, this.model.getPluginModels(['orion-test-plugin']));
 		});
 
 		it('should not set association properties on the model', function() {
