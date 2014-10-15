@@ -103,5 +103,10 @@ describe('config-loader', function() {
 			assert.equal(config.plugins['orion-test-plugin'].globalConfig.root, config.root);
 			assert.equal(config.plugins['orion-test-plugin'].plugins['orion-test-subplugin'].globalConfig.root, config.root);
 		});
+
+		it('should set defaults for plugins without a specified prefix', function() {
+			assert.equal(config.plugins['no-config-plugin'].prefix.route, '/no-config-plugin');
+			assert.equal(config.plugins['no-config-plugin'].prefix.model, 'no_config_plugin_');
+		});
 	});
 });
