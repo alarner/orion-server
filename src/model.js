@@ -125,7 +125,7 @@ var Model = function(config, sequelize) {
 		// Make associations
 		_.forOwn(rawModels, function(model, modelName) {
 			_.forOwn(model.attributes, function(attribute, name) {
-				if(!_.isString(attribute.type) || attribute.type.toLowerCase() != 'assocation') return;
+				if(!_.isString(attribute.type) || attribute.type.toLowerCase() != 'association') return;
 				var options = _.extend({}, attribute);
 				delete options.type;
 				delete options.method;
