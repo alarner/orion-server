@@ -4,11 +4,16 @@ var includeAll = require('include-all');
 var _ = require('lodash');
 var argv = require('optimist').argv;
 
+var defaultConfig = includeAll({
+	dirname     :  path.join(__dirname, 'default-config'),
+	filter      :  /^([^\.].*)\.js$/
+});
+
 var configLoader = function(root, globalRoot, pluginInfo) {
 	var self = this;
 
 	// Load app configuration files
-	var config = {};
+	var config = _.extend({}, defaultConfig);
 	try {
 		config = includeAll({
 			dirname     :  path.join(root, 'config'),
@@ -16,7 +21,7 @@ var configLoader = function(root, globalRoot, pluginInfo) {
 		});
 	}
 	catch(e) {
-		config = {};
+		//
 	}
 
 	var pluginOverrides = {};

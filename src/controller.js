@@ -44,6 +44,14 @@ module.exports = function(config) {
 					});
 					res.end(body);
 				};
+				res.internalServerError = function(body) {
+					if(body == undefined) body = 'Internal Server Error';
+					res.writeHead(500, {
+						'Content-Length': body.length,
+						'Content-Type': 'text/plain'
+					});
+					res.end(body);
+				};
 				res.redir = function(dest, status) {
 					status = status || 303;
 					if(dest.charAt(0) == '/') {
@@ -105,6 +113,8 @@ module.exports = function(config) {
 				async.eachSeries(
 					self.policySettings[info.controller][info.action],
 					function(policyName, cb) {
+						if(!self.cachedPolicies.hasOwnProperty(policyName))
+							return res.internalServerError('Unknown policy "'+policyName+'"');
 						return self.cachedPolicies[policyName](req, res, model, config, cb);
 					},
 					function(err) {

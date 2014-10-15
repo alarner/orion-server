@@ -88,6 +88,10 @@ var View = {
 						
 						return destination+(raw ? 'raw' : 'action');
 					});
+
+					Handlebars.registerHelper('json', function(obj) {
+						return JSON.stringify(obj);
+					});
 					
 					var compiled = Handlebars.compile(viewData.toString());
 					if(!compiled) return cb('Unable to compile view.');
