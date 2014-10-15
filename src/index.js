@@ -14,7 +14,7 @@ module.exports = function(root) {
 	}
 
 	// Load configuration files
-	var config = configLoader(root, root);
+	var config = configLoader(root);
 
 	// Set up logger options
 	_.forOwn(config.logger, function(value, key) {

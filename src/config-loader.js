@@ -9,7 +9,7 @@ var defaultConfig = includeAll({
 	filter      :  /^([^\.].*)\.js$/
 });
 
-var configLoader = function(root, globalRoot, pluginInfo) {
+var configLoader = function(root, globalConfig, pluginInfo) {
 	var self = this;
 
 	// Load app configuration files
@@ -37,7 +37,6 @@ var configLoader = function(root, globalRoot, pluginInfo) {
 	}
 
 	config.root = root;
-	config.globalRoot = globalRoot;
 	config.express = {app: express()};
 	config.argv = argv || {};
 	config.plugins = config.plugins || {};
@@ -54,6 +53,8 @@ var configLoader = function(root, globalRoot, pluginInfo) {
 	}
 
 	config.prefix = pluginInfo.prefix;
+	if(!globalConfig) globalConfig = config;
+	config.globalConfig = globalConfig;
 
 	_.forOwn(config.plugins, function(subPluginInfo, pluginName) {
 		if(!subPluginInfo.hasOwnProperty('prefix')) {
@@ -65,7 +66,7 @@ var configLoader = function(root, globalRoot, pluginInfo) {
 		subPluginInfo.name = pluginName;
 		subPluginInfo.prefix.model = config.prefix.model + subPluginInfo.prefix.model;
 		subPluginInfo.prefix.route = path.join(config.prefix.route, subPluginInfo.prefix.route);
-		var pluginConfig = configLoader(path.join(root, 'node_modules', pluginName), globalRoot, subPluginInfo);
+		var pluginConfig = configLoader(path.join(root, 'node_modules', pluginName), globalConfig, subPluginInfo);
 
 		if(pluginOverrides.hasOwnProperty(pluginName)) {
 			pluginConfig = _.extend(

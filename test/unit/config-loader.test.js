@@ -8,7 +8,7 @@ describe('config-loader', function() {
 
 	describe('when we call config-loader', function() {
 		var root = path.join(__dirname, '../fixtures');
-		var config = configLoader(root, root)
+		var config = configLoader(root)
 		it('should set the root', function() {
 			assert.equal(config.root, path.join(__dirname, '../fixtures'));
 		});
@@ -99,9 +99,9 @@ describe('config-loader', function() {
 		});
 
 		it('should set the global root', function() {
-			assert.equal(config.globalRoot, config.root);
-			assert.equal(config.plugins['orion-test-plugin'].globalRoot, config.root);
-			assert.equal(config.plugins['orion-test-plugin'].plugins['orion-test-subplugin'].globalRoot, config.root);
+			assert.equal(config.globalConfig.root, config.root);
+			assert.equal(config.plugins['orion-test-plugin'].globalConfig.root, config.root);
+			assert.equal(config.plugins['orion-test-plugin'].plugins['orion-test-subplugin'].globalConfig.root, config.root);
 		});
 	});
 });
