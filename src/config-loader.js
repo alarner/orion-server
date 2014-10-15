@@ -2,6 +2,9 @@ var express = require('express');
 var path = require('path');
 var includeAll = require('include-all');
 var _ = require('lodash');
+var changeCase = require('change-case');
+var underscoreDeepExtend = require('underscore-deep-extend');
+_.mixin({deepExtend: underscoreDeepExtend(_)});
 var argv = require('optimist').argv;
 
 var defaultConfig = includeAll({
@@ -13,7 +16,7 @@ var configLoader = function(root, globalConfig, pluginInfo) {
 	var self = this;
 
 	// Load app configuration files
-	var config = _.extend({}, defaultConfig);
+	var config = _.deepExtend({}, defaultConfig);
 	try {
 		config = includeAll({
 			dirname     :  path.join(root, 'config'),
@@ -57,19 +60,20 @@ var configLoader = function(root, globalConfig, pluginInfo) {
 	config.globalConfig = globalConfig;
 
 	_.forOwn(config.plugins, function(subPluginInfo, pluginName) {
-		if(!subPluginInfo.hasOwnProperty('prefix')) {
-			subPluginInfo.prefix = {
-				route: '/'+(subPluginInfo.name || ''),
-				model: subPluginInfo.name || ''
-			};
-		}
+		if(!subPluginInfo.hasOwnProperty('prefix'))
+			subPluginInfo.prefix = {};
+		if(!subPluginInfo.prefix.hasOwnProperty('route'))
+			subPluginInfo.prefix.route = '/'+pluginName;
+		if(!subPluginInfo.prefix.hasOwnProperty('model'))
+			subPluginInfo.prefix.model = changeCase.snakeCase(pluginName)+'_';
+
 		subPluginInfo.name = pluginName;
 		subPluginInfo.prefix.model = config.prefix.model + subPluginInfo.prefix.model;
 		subPluginInfo.prefix.route = path.join(config.prefix.route, subPluginInfo.prefix.route);
 		var pluginConfig = configLoader(path.join(root, 'node_modules', pluginName), globalConfig, subPluginInfo);
 
 		if(pluginOverrides.hasOwnProperty(pluginName)) {
-			pluginConfig = _.extend(
+			pluginConfig = _.deepExtend(
 				pluginConfig,
 				pluginOverrides[pluginName]
 			);

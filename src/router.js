@@ -50,7 +50,6 @@ module.exports = function() {
 						.join('')
 					: info.config.router.options.defaultAction;
 				info.action = info.action.charAt(0).toLowerCase() + info.action.slice(1);
-				// info.action = match.action || config.router.options.defaultAction;
 				delete match.action;
 			}
 
@@ -73,16 +72,6 @@ module.exports = function() {
 		// Add plugin routes
 		_.forOwn(parentConfig.plugins, function(childConfig, name) {
 			self.loadRoutes(childConfig);
-			// if(!pluginConfig.router) pluginConfig.router = {};
-			// if(!pluginConfig.router.routes) pluginConfig.router.routes = {};
-
-			// self.addRoutes(
-			// 	pluginConfig.router.routes,
-			// 	self.routes,
-			// 	name,
-			// 	pluginConfig.prefix.route,
-			// 	true
-			// );
 		});
 
 		// Add parent catchall route
@@ -104,9 +93,6 @@ module.exports = function() {
 
 	this.addRoutes = function(parentConfig) {
 		var prefix = parentConfig.prefix.route || false;
-		// var pluginPath = routeObject.prefix.route || false;
-		// if(!prefix || !prefix.length) prefix = false;
-		// if(!plugin || !plugin.length) plugin = false;
 
 		// Normalize the prefix to start with a forward slash and *not* end with a forward slash.
 		if(prefix)
@@ -144,23 +130,5 @@ module.exports = function() {
 				info: parsed
 			});
 		});
-
-		// if(catchall) {
-		// 	var route = '(/:controller)(/:action)(/:id)';
-		// 	if(prefix)
-		// 		route = prefix+route;
-
-		// 	self.routes.push({
-		// 		pattern: urlPattern.newPattern(route),
-		// 		info: {
-		// 			method: '*',
-		// 			route: route,
-		// 			controller: null,
-		// 			action: null,
-		// 			prefix: prefix,
-		// 			plugin: plugin
-		// 		}
-		// 	});
-		// }
 	};
 };
