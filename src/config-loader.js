@@ -1,5 +1,6 @@
 var express = require('express');
 var path = require('path');
+var fs = require('fs');
 var includeAll = require('include-all');
 var _ = require('lodash');
 var changeCase = require('change-case');
@@ -17,26 +18,22 @@ var configLoader = function(root, globalConfig, pluginInfo) {
 
 	// Load app configuration files
 	var config = _.deepExtend({}, defaultConfig);
-	try {
+	var configPath = path.join(root, 'config');
+	if(fs.existsSync(configPath)) {
 		config = includeAll({
-			dirname     :  path.join(root, 'config'),
+			dirname     :  configPath,
 			filter      :  /^([^\.].*)\.js$/
 		});
-	}
-	catch(e) {
-		//
 	}
 
-	var pluginOverrides = {};
 	// Load plugin override configuration files
-	try {
+	var pluginOverrides = {};
+	var pluginOverridePath = path.join(configPath, 'plugins');
+	if(fs.existsSync(pluginOverridePath)) {
 		pluginOverrides = includeAll({
-			dirname     :  path.join(root, 'config', 'plugins'),
+			dirname     :  pluginOverridePath,
 			filter      :  /^([^\.].*)\.js$/
 		});
-	}
-	catch(e) {
-		pluginOverrides = {};
 	}
 
 	config.root = root;

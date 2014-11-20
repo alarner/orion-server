@@ -1,5 +1,6 @@
 var includeAll = require('include-all');
 var async = require('async');
+var fs = require('fs');
 var _ = require('lodash');
 var winston = require('winston');
 var path = require('path');
@@ -135,14 +136,12 @@ module.exports = function(config) {
 		if(!pluginConfigPolicies)
 			pluginConfigPolicies = {};
 
-		try {
+		var pluginControllersPath = path.join(pluginConfig.root, 'app', 'controllers');
+		if(fs.existsSync(pluginControllersPath)) {
 			pluginControllers = includeAll({
-				dirname     :  path.join(pluginConfig.root, 'app', 'controllers'),
+				dirname     :  pluginControllersPath,
 				filter      :  /^([^\.].*Controller)\.js$/
 			});
-		}
-		catch(e) {
-			pluginControllers = {};
 		}
 
 		_.forOwn(pluginControllers, function(actions, controllerName) {
@@ -259,15 +258,14 @@ module.exports = function(config) {
 		if(!pluginPath) pluginPath = [];
 		var self = this;
 		var pluginPolicies = {};
-		try {
+		var pluginPoliciesPath = path.join(pluginConfig.root, 'app', 'policies');
+		if(fs.existsSync(pluginPoliciesPath)) {
 			pluginPolicies = includeAll({
 				dirname     :  path.join(pluginConfig.root, 'app', 'policies'),
 				filter      :  /^([^\.].*)\.js$/
 			});
 		}
-		catch(e) {
-			pluginPolicies = {};
-		}
+
 		_.forOwn(pluginPolicies, function(policy, name) {
 			if(pluginPath.length)
 				name = pluginPath.join('::')+'::'+name;

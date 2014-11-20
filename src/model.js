@@ -1,6 +1,7 @@
 var Sequelize = require('sequelize');
 var includeAll = require('include-all');
 var path = require('path');
+var fs = require('fs');
 var _ = require('lodash');
 var changeCase = require('change-case');
 var underscoreDeepExtend = require('underscore-deep-extend');
@@ -57,14 +58,12 @@ var Model = function(config, sequelize) {
 	this.load = function() {
 		var self = this;
 		var rawModels = {};
-		try {
+		var rawModelsPath = path.join(config.root, 'app', 'models');
+		if(fs.existsSync(rawModelsPath)) {
 			rawModels = includeAll({
-				dirname     :  path.join(config.root, 'app', 'models'),
+				dirname     :  rawModelsPath,
 				filter      :  /^([^\.].*)\.js$/
 			});
-		}
-		catch(e) {
-			rawModels = {};
 		}
 
 		_.forOwn(rawModels, function(model, modelName) {
