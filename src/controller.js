@@ -7,6 +7,7 @@ var path = require('path');
 var serveStatic = require('serve-static');
 var skipper = require('skipper')();
 var session = require('express-session');
+var Handlebars = require('handlebars');
 
 module.exports = function(config) {
 	var self = this;
@@ -68,14 +69,22 @@ module.exports = function(config) {
 				};
 				req.error = function() {
 					var message = '';
+					var params = false;
 					if(req.session.hasOwnProperty('orion')) {
 						if(req.session.orion.hasOwnProperty('error')) {
 							if(req.session.orion.error.hasOwnProperty('message')) {
 								message = req.session.orion.error.message;
 							}
+							if(req.session.orion.error.hasOwnProperty('params')) {
+								params = req.session.orion.error.params;
+							}
 							delete req.session.orion.error;
 						}
 					}
+
+					if(message && params)
+						message = Handlebars.compile(message)(params);
+
 					return message;
 				};
 				req.last = function(type, key) {
