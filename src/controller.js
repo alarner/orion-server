@@ -87,16 +87,6 @@ module.exports = function(config) {
 
 					return message;
 				};
-				req.last = function(type, key) {
-					if(req.session.orion.lastData) {
-						if(req.session.orion.lastData.hasOwnProperty(type)) {
-							if(req.session.orion.lastData[type].hasOwnProperty(key)) {
-								return req.session.orion.lastData[type][key];
-							}
-						}
-					}
-					return '';
-				};
 				cb();
 			}
 		], cb)
