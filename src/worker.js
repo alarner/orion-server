@@ -38,7 +38,7 @@ module.exports = function(cluster, config) {
 			http.createServer(function(req, res) {
 				Request(req, res, config);
 				Response(req, res, config);
-				var routeInfo = router.route(req.method, req.url);
+				var routeInfo = router.route(req.method, req.parsedUrl.pathname);
 				controller.run(req, res, routeInfo, model);
 			}).listen(config.webserver.port);
 			cluster.worker.send('orion::ready');

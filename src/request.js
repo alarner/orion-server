@@ -1,3 +1,4 @@
+var url = require('url');
 var expressRequest = require('express').request;
 var Handlebars = require('handlebars');
 
@@ -5,6 +6,8 @@ module.exports = function(req, res, config) {
 	req.__proto__ = expressRequest
 	req.res = res;
 	req.app = config.express.app;
+	if(!req.url) throw 'Missing url in the request.';
+	req.parsedUrl = url.parse(req.url, true);
 	req.last = function(type, key) {
 		if(req.session.orion.lastData) {
 			if(req.session.orion.lastData.hasOwnProperty(type)) {

@@ -3,6 +3,7 @@ module.exports = function() {
 		info: {
 			controller: 'IndexController',
 			action: 'index'
-		}
+		},
+		url: '/'
 	};
 };
