@@ -18,4 +18,33 @@ module.exports = function(req, res, config) {
 			trace: trace
 		});
 	};
+	res.notFound = function(body) {
+		if(body == undefined) body = 'Page Not Found';
+		res.writeHead(404, {
+			'Content-Length': body.length,
+			'Content-Type': 'text/plain'
+		});
+		res.end(body);
+	};
+	res.internalServerError = function(body) {
+		if(body == undefined) body = 'Internal Server Error';
+		res.writeHead(500, {
+			'Content-Length': body.length,
+			'Content-Type': 'text/plain'
+		});
+		res.end(body);
+	};
+	res.redir = function(dest, status) {
+		status = status || 303;
+		if(dest.charAt(0) == '/') {
+			dest = path.join(config.prefix.route, dest);
+		}
+		return res.redirect(status, dest);
+	};
+	res.error = function(err) {
+		if(!req.session.orion.hasOwnProperty('error'))
+			req.session.orion.error = {};
+
+		req.session.orion.error = err;
+	};
 };

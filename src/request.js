@@ -16,5 +16,26 @@ module.exports = function(req, res, config) {
 		return '';
 	};
 
+	req.error = function() {
+		var message = '';
+		var params = false;
+		if(req.session.hasOwnProperty('orion')) {
+			if(req.session.orion.hasOwnProperty('error')) {
+				if(req.session.orion.error.hasOwnProperty('message')) {
+					message = req.session.orion.error.message;
+				}
+				if(req.session.orion.error.hasOwnProperty('params')) {
+					params = req.session.orion.error.params;
+				}
+				delete req.session.orion.error;
+			}
+		}
+
+		if(message && params)
+			message = Handlebars.compile(message)(params);
+
+		return message;
+	};
+
 	Handlebars.registerHelper('last', req.last);
 };
