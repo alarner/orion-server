@@ -1,6 +1,7 @@
 var http = require('http');
 var async = require('async');
 var path = require('path');
+var winston = require('winston');
 var Router = require('./router');
 var Controller = require('./controller');
 var Request = require('./request');
@@ -25,9 +26,14 @@ module.exports = function(cluster, config) {
 		model.load(config);
 
 		async.parallel({
-			// models: function(cb) {
-			// 	model.loadDatabase(cb);
-			// },
+			models: function(cb) {
+				if(!config.argv['sync-db']) return cb();
+				model.sequelize.sync({force: true}).then(cb, function(err) {
+					winston.warn('Unable to sync models.');
+					winston.warn(err);
+					cb();
+				});
+			},
 			layouts: function(cb) {
 				View.loadLayouts(
 					path.join(config.root, '/layouts'),

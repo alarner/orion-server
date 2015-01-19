@@ -26,8 +26,22 @@ module.exports = function(req, res, config) {
 		});
 		res.end(body);
 	};
+	res.badRequest = function(body) {
+		if(body == undefined) body = 'Bad Request';
+		res.writeHead(400, {
+			'Content-Length': body.length,
+			'Content-Type': 'text/plain'
+		});
+		res.end(body);
+	};
 	res.internalServerError = function(body) {
 		if(body == undefined) body = 'Internal Server Error';
+		if(typeof body !== 'string') {
+			if(typeof body === 'object')
+				body = JSON.stringify(body);
+			else
+				body = body.toString();
+		}
 		res.writeHead(500, {
 			'Content-Length': body.length,
 			'Content-Type': 'text/plain'
